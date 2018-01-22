@@ -1,3 +1,5 @@
+from players import Player, Human, Computer
+
 class Territory:
     def __init__(self, name, title, player=None, armies=0):
         self.name = name
@@ -37,6 +39,7 @@ class Territory:
     def weaken(self, diff):
         self.armies -= diff
 
+
 class Continent:
     def __init__(self, name, territorylist, units):
         self.name = name
@@ -56,13 +59,21 @@ class Continent:
     def get_units(self):
         return self.units
 
+
 class Board:
-    def __init__(self, territorylist, continentlist, playerslist, map_name):
+    def __init__(self, territorylist, continentlist, playerslist, map_name, unitchart):
         self.map_name = map_name
         self.territories = territorylist
         self.continents = continentlist
-        self.players = playerslist
+        self.players = {}
         self.status = 1
+        self.starting_units = sum(unitchart.values())
+        units = unitchart[len(playerslist)]
+        for key, player in playerslist.items():
+            if player[0] == 'self-player':
+                self.players['player'+str(key)] = Human(key, player[1], units)
+            elif player[0] == 'ai-player':
+                self.players['player'+str(key)] = Computer(key, player[1], units)
 
     def get_map_name(self):
         return self.map_name
@@ -81,9 +92,11 @@ class Board:
 
     def turn(self):
         if self.status <= len(self.territories):
-            result = ['initial', self.status % len(self.players), self.status]
+            result = ['initial', self.status]
+        elif self.status <= self.starting_units:
+            result = ['initial-reinforce', self.status]
         else:
-            turn = self.status - len(self.territories)
+            turn = self.status - self.starting_units
             if turn % 3 == 0:
                 result = ['deployment', (turn // 3) + 1]
             elif turn % 3 == 1:
@@ -94,13 +107,13 @@ class Board:
 
     def active_player(self):
         if self.status <= len(self.territories):
-            result = self.status % len(self.players)
+            id = self.status % len(self.players)
         else:
-            turn = self.status - len(self.territories)
-            result = ((turn // 3) + 1) % len(self.players)
-        if result == 0:
-            result = len(self.players)
-        return result
+            turn = self.status - self.starting_units
+            id = ((turn // 3) + 1) % len(self.players)
+        if id == 0:
+            id = len(self.players)
+        return self.players['player' + str(id)]
 
     def new_turn(self):
         self.status += 1
@@ -112,8 +125,24 @@ class Board:
                 terlist.append(ter.get_name())
         return terlist
 
+    def set_owner(self, territory, new_owner, armies):
+        territory = self.territories[territory]
+        old_owner = territory.get_owner()
+        if old_owner != 'noplayer':
+            old_owner.abandon_territory(territory)
+        self.players[new_owner].possess_territory(territory)
+        territory.set_owner(new_owner, armies)
+
+    def units_left(self):
+        units = 0
+        for key, player in self.players.items():
+            units += player.get_units()
+
+
 
 def set_connections(*connections):
     for pair in connections:
         pair[0].make_connection(pair[1])
         pair[1].make_connection(pair[0])
+
+

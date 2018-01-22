@@ -128,15 +128,29 @@ def create_map(players, map_name):
         (westAustr, eastAustr)
     )
 
-    northAmerica = Continent('NorthAmerica', [alaska, northwestTer, greenland, alberta, ontario, quebec, westUS,
+    unitchart = {2: 50, 3: 35, 4: 30, 5: 25, 6: 20}
 
-                                          eastUS, centralAmer], 5)
+    northAmerica = Continent('NorthAmerica', [alaska, northwestTer, greenland, alberta, ontario, quebec, westUS,
+                                       eastUS, centralAmer], 5)
     southAmerica = Continent('SouthAmerica', [venezuela, peru, brazil, argentina], 2)
     europe = Continent('Europe', [iceland, scandinavia, ukraine, greatBritain, northEur, westEur, southEur], 5)
-    asia = Continent('Asia', [ural, siberia, yakutsk, kamchatka, irkutsk, mongolia, japan, afghanistan, china, middleEast, india, siam], 7)
+    asia = Continent('Asia', [ural, siberia, yakutsk, kamchatka, irkutsk, mongolia, japan, afghanistan, china,
+                              middleEast, india, siam], 7)
     africa = Continent('Africa', [northAfr, egypt, eastAfr, congo, madagascar, southAfr], 3)
     australia = Continent('Australia', [indonesia, newGuinea, westAustr, eastAustr], 2)
 
-    board = Board({'alaska': alaska, 'northwestTer': northwestTer, 'greenland': greenland, 'alberta': alberta, 'ontario': ontario, 'quebec': quebec, 'westUS': westUS, 'eastUS': eastUS, 'centralAmer': centralAmer, 'venezuela': venezuela, 'peru': peru, 'brazil': brazil, 'argentina': argentina, 'iceland': iceland, 'scandinavia': scandinavia, 'ukraine': ukraine, 'greatBritain': greatBritain, 'northEur': northEur, 'westEur': westEur, 'southEur': southEur, 'ural': ural, 'siberia': siberia, 'yakutsk': yakutsk, 'kamchatka': kamchatka, 'irkutsk': irkutsk, 'mongolia': mongolia, 'japan': japan, 'afghanistan': afghanistan, 'china': china, 'middleEast': middleEast, 'india': india, 'siam': siam, 'northAfr': northAfr, 'egypt': egypt, 'eastAfr': eastAfr, 'congo': congo, 'madagascar': madagascar, 'southAfr': southAfr, 'indonesia': indonesia, 'newGuinea': newGuinea, 'westAustr': westAustr, 'eastAustr': eastAustr}, {'northAmerica': northAmerica, 'southAmerica': southAmerica, 'europe': europe, 'asia': asia, 'africa': africa, 'australia': australia}, players, map_name)
+    board = Board({'alaska': alaska, 'northwestTer': northwestTer, 'greenland': greenland, 'alberta': alberta,
+                   'ontario': ontario, 'quebec': quebec, 'westUS': westUS, 'eastUS': eastUS, 'centralAmer': centralAmer,
+                   'venezuela': venezuela, 'peru': peru, 'brazil': brazil, 'argentina': argentina, 'iceland': iceland,
+                   'scandinavia': scandinavia, 'ukraine': ukraine, 'greatBritain': greatBritain, 'northEur': northEur,
+                   'westEur': westEur, 'southEur': southEur, 'ural': ural, 'siberia': siberia, 'yakutsk': yakutsk,
+                   'kamchatka': kamchatka, 'irkutsk': irkutsk, 'mongolia': mongolia, 'japan': japan,
+                   'afghanistan': afghanistan, 'china': china, 'middleEast': middleEast, 'india': india, 'siam': siam,
+                   'northAfr': northAfr, 'egypt': egypt, 'eastAfr': eastAfr, 'congo': congo, 'madagascar': madagascar,
+                   'southAfr': southAfr, 'indonesia': indonesia, 'newGuinea': newGuinea, 'westAustr': westAustr,
+                   'eastAustr': eastAustr},
+                  {'northAmerica': northAmerica, 'southAmerica': southAmerica, 'europe': europe, 'asia': asia,
+                   'africa': africa, 'australia': australia},
+                  players, map_name, unitchart)
 
     return board

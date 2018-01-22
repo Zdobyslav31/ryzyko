@@ -69,14 +69,15 @@ def new(map_name, players):
 @app.route('/play/initial/<territory>', methods=['GET', 'POST'])
 def initial(territory=None):
     board = pickle.load(open('board.pkl', 'rb'))
+    active_player = board.active_player()
     if board.territories[territory].get_owner() == 'noplayer':
-        board.territories[territory].set_owner('player' + str(board.active_player()), 1)
-    elif board.territories[territory].get_owner() == 'player' + str(board.active_player()):
-        board.territories[territory].reinforce(1)
+        board.set_owner(territory, 'player' + str(active_player.get_id()), 1)
+        active_player.decrease_units(1)
     else:
         return 'Action not allowed!'
 
     board.new_turn()
+
     pickle.dump(board, open('board.pkl', 'wb'))
     active_territories = board.player_territories('player' + str(board.active_player()))
     active_territories += board.player_territories('noplayer')
@@ -86,7 +87,7 @@ def initial(territory=None):
 def newgame():
     players = {}
     for i in range(1,int(request.args.get('players_num')) + 1):
-        players[str(i)] = request.args.get('player' + str(i))
+        players[str(i)] = [request.args.get('player' + str(i)), request.args.get('player' + str(i) + 'name')]
     map_name = request.args.get('map_name')
     board = new(map_name, players)
     pickle.dump(board, open('board.pkl', 'wb'))
@@ -102,8 +103,8 @@ def play():
 
 def render_board(board, active_territories):
     return render_template('play.html', map=board.get_map_name(), territories=board.get_territories(),
-                           continents=board.get_continents(), turn=board.turn(), player=board.active_player(),
-                           active_territories=active_territories)
+                           continents=board.get_continents(), turn=board.turn(), player=board.active_player().get_name(),
+                           active_territories=active_territories, units_left=board.active_player().get_units())
 
 
 if __name__ == '__main__':

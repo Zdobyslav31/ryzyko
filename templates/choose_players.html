@@ -12,20 +12,29 @@
             <option value="self-player">Ja (ten komputer)</option>
             <option value="ai-player" disabled>Gracz komputerowy</option>
             <option value="human-player" disabled>Inny gracz online</option>
-        </select><br>
+        </select>
+        <label for="player1name">Imię gracza:</label>
+        <input type="text", name="player1name">
+        <br>
         <label for="player2">Gracz 2</label>
         <select name="player2">
             <option value="self-player">Ten komputer</option>
             <option value="ai-player">Gracz komputerowy</option>
             <option value="human-player" disabled>Inny gracz online</option>
-        </select><br>
+        </select>
+        <label for="player2name">Imię gracza:</label>
+        <input type="text", name="player2name">
+        <br>
         {% for i in range(3,players_num+1) %}
             <label for="player{{ i }}">Gracz {{ i }}</label>
             <select name="player{{ i }}">
                 <option value="self-player">Ten komputer</option>
                 <option value="ai-player">Gracz komputerowy</option>
                 <option value="human-player" disabled>Inny gracz online</option>
-            </select><br>
+            </select>
+        <label for="player{{ i }}name">Imię gracza:</label>
+        <input type="text", name="player{{ i }}name">
+        <br>
         {% endfor %}
         <input type="hidden" name="players_num" value="{{ players_num }}">
         <input type="hidden" name="map_name" value="{{ map_name }}">

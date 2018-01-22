@@ -7,7 +7,10 @@
     <link rel=stylesheet type=text/css href="{{ url_for('static', filename=map + '/style.css') }}">
 </head>
 <body>
-    Phase: {{ turn[0] }}, active player: {{ player }}, total turn: {{ turn[1] }}
+    Phase: {{ turn[0] }}, active player: {{ player }}, total turn: {{ turn[1] }}<br>
+    {% if turn[0] == 'initial' %}
+        Units left: {{ units_left }}
+    {% endif %}
     <div class="board-container">
         <img class="board" src="{{ url_for('static', filename=map+'/mapa.png') }}">
         {% for territory in territories %}

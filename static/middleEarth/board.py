@@ -37,9 +37,15 @@ def create_map(players, map_name):
         (gondor, harad)
     )
 
+    unitchart = {2: 15, 3: 12, 4: 9, 5: 7, 6: 6}
+
     arnor = Continent('Arnor', [lindon, eriador, enedwaith], 2)
     shadowlands = Continent('Shadowlands', [mordor, rhun, khand], 1)
 
-    board = Board({'lindon': lindon, 'eriador': eriador, 'forodwaith': forodwaith, 'enedwaith': enedwaith, 'moria': moria, 'rhovanion': rhovanion, 'rohan': rohan, 'gondor': gondor, 'rhun': rhun, 'mordor': mordor, 'khand': khand, 'harad': harad}, {'arnor': arnor, 'shadowlands': shadowlands}, players, map_name)
+    board = Board({'lindon': lindon, 'eriador': eriador, 'forodwaith': forodwaith, 'enedwaith': enedwaith,
+                   'moria': moria, 'rhovanion': rhovanion, 'rohan': rohan, 'gondor': gondor, 'rhun': rhun,
+                   'mordor': mordor, 'khand': khand, 'harad': harad},
+                  {'arnor': arnor, 'shadowlands': shadowlands},
+                  players, map_name, unitchart)
 
     return board
