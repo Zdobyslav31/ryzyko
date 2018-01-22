@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Ryzyko - tworzenie nowej gry</title>
+</head>
+<body>
+    <form method="GET" action="{{ url_for('choose_players')}}">
+
+        <label for="players">Wybierz ilość graczy</label><br>
+        <input type="radio" name="players" value="2" required>2<br>
+        <input type="radio" name="players" value="3" required>3<br>
+        <input type="radio" name="players" value="4" required>4<br>
+        <input type="radio" name="players" value="5" required>5<br>
+        <input type="radio" name="players" value="6" required>6<br>
+        <br>
+        <label for="map_name">Wybierz mapę</label><br>
+        <input type="radio" name="map_name" value="world" required>Ryzyko - Świat<br>
+        <input type="radio" name="map_name" value="middleEarth" required>Śródziemie<br>
+
+        <input type="hidden" name="newgame" value="True">
+        <input type="submit" value="Graj!">
+    </form>
+</body>
+</html>

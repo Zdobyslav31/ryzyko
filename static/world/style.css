@@ -1,0 +1,250 @@
+#alaska {
+	left: 70px;
+	top: 110px;
+}
+
+#northwestTer {
+	left: 215px;
+	top: 110px;
+}
+
+#greenland {
+	left: 335px;
+	top: 80px;
+}
+	
+#alberta {
+	left: 155px;
+	top: 160px;
+}
+	
+#ontario {
+	left: 230px;
+	top: 170px;
+}
+	
+#quebec {
+	left: 275px;
+	top: 175px;
+}
+	
+#westUS {
+	left: 160px;
+	top: 235px;
+}
+	
+#eastUS {
+	left: 225px;
+	top: 255px;
+}
+	
+#centralAmer {
+	left: 175px;
+	top: 300px;
+}
+
+
+#venezuela {
+	left: 220px;
+	top: 370px;
+}
+	
+#peru {
+	left: 265px;
+	top: 445px;
+}
+	
+#brazil {
+	left: 310px;
+	top: 435px;
+}
+	
+#argentina {
+	left: 255px;
+	top: 520px;
+}
+	
+	
+#iceland {
+	left: 425px;
+	top: 140px;
+}
+	
+#scandinavia {
+	left: 485px;
+	top: 135px;
+}
+	
+#ukraine {
+	left: 565px;
+	top: 190px;
+}
+	
+#greatBritain {
+	left: 420px;
+	top: 210px;
+}
+	
+#northEur {
+	left: 475px;
+	top: 225px;
+}
+	
+#westEur {
+	left: 440px;
+	top: 255px;
+}
+	
+#southEur {
+	left: 510px;
+	top: 280px;
+}
+	
+#ural {
+	left: 675px;
+	top: 165px;
+}
+	
+#siberia {
+	left: 720px;
+	top: 130px;
+}
+	
+#yakutsk {
+	left: 780px;
+	top: 95px;
+}
+	
+#kamchatka {
+	left: 845px;
+	top: 105px;
+}
+	
+#irkutsk {
+	left: 770px;
+	top: 170px;
+}
+	
+#mongolia {
+	left: 790px;
+	top: 235px;
+}
+	
+#japan {
+	left: 890px;
+	top: 215px;
+}
+	
+#afghanistan {
+	left: 660px;
+	top: 255px;
+}
+	
+#china {
+	left: 740px;
+	top: 270px;
+}
+	
+#middleEast {
+	left: 600px;
+	top: 345px;
+}
+	
+#india {
+	left: 690px;
+	top: 305px;
+}
+	
+#siam {
+	left: 790px;
+	top: 370px;
+}
+	
+
+#northAfr {
+	left: 470px;
+	top: 400px;
+}
+	
+#egypt {
+	left: 500px;
+	top: 360px;
+}
+	
+#eastAfr {
+	left: 560px;
+	top: 415px;
+}
+	
+#congo {
+	left: 535px;
+	top: 485px;
+}
+	
+#madagascar {
+	left: 605px;
+	top: 555px;
+}
+	
+#southAfr {
+	left: 535px;
+	top: 570px;
+}
+	
+
+#indonesia {
+	left: 800px;
+	top: 485px;
+}
+	
+#newGuinea {
+	left: 885px;
+	top: 455px;
+}
+	
+#westAustr {
+	left: 845px;
+	top: 535px;
+}
+	
+#eastAustr {
+	left: 895px;
+	top: 520px;
+}
+
+	
+#NorthAmerica {
+	left: 80px;
+	top: 170px;
+	border: 3px solid #c1974c;
+}
+
+#SouthAmerica {
+	left: 180px;
+	top: 450px;
+	border: 3px solid #984532;
+}
+
+#Europe {
+	left: 460px;
+	top: 60px;
+	border: 3px solid #676c69;
+}
+
+#Asia {
+	left: 855px;
+	top: 285px;
+	border: 3px solid #5d693d;
+}
+
+#Africa {
+	left: 450px;
+	top: 465px;
+	border: 3px solid #8a6434;
+}
+
+#Australia {
+	left: 770px;
+	top: 520px;
+	border: 3px solid #7e5558;
+}

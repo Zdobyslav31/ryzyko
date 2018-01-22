@@ -1,0 +1,82 @@
+.board {
+	width: 1000px;
+	position: absolute;
+	top: 0px;
+	left: 0px;
+}
+
+.board-container {
+	position: absolute;
+}
+
+.circle {
+	width: 20px;
+    height: 20px;
+    border-radius: 50%;
+	text-align: center;
+	position: absolute;
+	font-family: Georgia, serif;
+	-webkit-box-shadow: inset 0px 0px 5px 1px rgba(0,0,0,0.41);
+	-moz-box-shadow: inset 0px 0px 5px 1px rgba(0,0,0,0.41);
+	box-shadow: inset 0px 0px 5px 1px rgba(0,0,0,0.41);
+}
+
+.circle:hover {
+	color: white;
+}
+
+.continental {
+    border-radius: 10%;
+	width: 33px;
+    height: 33px;
+	font-size: 1.5em;
+	color: darkgrey;
+}
+
+.continental:hover {
+	color: darkgrey;
+}
+
+.marked {
+	-webkit-box-shadow: inset 0px 0px 5px 1px rgba(255,255,255,1);
+	-moz-box-shadow: inset 0px 0px 5px 1px rgba(255,255,255,1);
+	box-shadow: inset 0px 0px 5px 1px rgba(255,255,255,1);
+}
+
+.noplayer {
+	background: white;
+    border: 1px solid white;
+	-webkit-box-shadow: 0px 0px 5px 1px rgba(0,0,0,0.41);
+	-moz-box-shadow: 0px 0px 5px 1px rgba(0,0,0,0.41);
+	box-shadow: 0px 0px 5px 1px rgba(0,0,0,0.41);
+}
+
+.player1 {
+    background: red;
+    border: 1px solid darkred;
+}
+
+.player2 {
+    background: blue;
+    border: 1px solid darkblue;
+}
+
+.player3 {
+    background: green;
+    border: 1px solid darkgreen;
+}
+
+.player4 {
+    background: gold;
+    border: 1px solid gold;
+}
+
+.player5 {
+    background: grey;
+    border: 1px solid black;
+}
+
+.player6 {
+    background: lightgrey;
+    border: 1px solid grey;
+}
