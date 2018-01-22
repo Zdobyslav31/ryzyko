@@ -139,7 +139,6 @@ class Board:
             units += player.get_units()
 
 
-
 def set_connections(*connections):
     for pair in connections:
         pair[0].make_connection(pair[1])

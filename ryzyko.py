@@ -1,5 +1,5 @@
 from flask import Flask, request, render_template, redirect, url_for
-import random, os, pickle, importlib
+import random, os, pickle, importlib, game
 
 app = Flask(__name__)
 GAMES_LIST = {}
@@ -8,35 +8,6 @@ GAMES_LIST = {}
 @app.route('/')
 def hello():
     return render_template('hello.html')
-
-
-"""
-Test
-"""
-@app.route('/test')
-def test(compvalue=None):
-
-    if request.args.get('test'):
-        return render_template('test.html', form=False, test=request.args.get('test'))
-    elif compvalue:
-        return render_template('test.html', form=False, test=compvalue)
-    else:
-        return render_template('test.html', form=True, test=None )
-
-
-@app.route('/testing')
-def testing():
-    race = request.args.get('race')
-    if race == 'computer':
-        return test(31)
-    elif race == 'human':
-        return render_template('get_test_data.html')
-    else:
-        return 'Bad race'
-
-"""
-/test
-"""
 
 
 @app.route('/customize')
@@ -54,16 +25,7 @@ def choose_players():
         return redirect(url_for('customize'))
 
 
-def new(map_name, players):
-    # id = random.randrange(0,100)
 
-    importlib.import_module('static.' + map_name)
-    board = importlib.import_module('.board', package='static.' + map_name)
-
-    board = board.create_map(players, map_name)
-    # GAMES_LIST[id] = board
-    # session['boardid'] = id
-    return board
 
 
 @app.route('/play/initial/<territory>', methods=['GET', 'POST'])
@@ -77,11 +39,12 @@ def initial(territory=None):
         return 'Action not allowed!'
 
     board.new_turn()
-
     pickle.dump(board, open('board.pkl', 'wb'))
-    active_territories = board.player_territories('player' + str(board.active_player()))
-    active_territories += board.player_territories('noplayer')
-    return render_board(board, active_territories)
+
+    # return game(board)
+
+    return game.game(board)
+
 
 @app.route('/newgame', methods=['GET', 'POST'])
 def newgame():
@@ -91,14 +54,28 @@ def newgame():
     map_name = request.args.get('map_name')
     board = new(map_name, players)
     pickle.dump(board, open('board.pkl', 'wb'))
-    active_territories = board.player_territories('player' + str(board.active_player()))
-    active_territories += board.player_territories('noplayer')
-    return render_board(board, active_territories)
+
+    return game.game(board)
 
 
 @app.route('/play', methods=['GET', 'POST'])
 def play():
     return 'Oooops'
+
+
+"""Funkcje pomocnicze"""
+
+
+def new(map_name, players):
+    # id = random.randrange(0,100)
+
+    importlib.import_module('static.' + map_name)
+    board = importlib.import_module('.board', package='static.' + map_name)
+
+    board = board.create_map(players, map_name)
+    # GAMES_LIST[id] = board
+    # session['boardid'] = id
+    return board
 
 
 def render_board(board, active_territories):
