@@ -104,16 +104,16 @@ class Board:
             conlist.append([con.get_name(), con.repr_owner(), con.get_units()])
         return conlist
 
-    def turn(self):
+    def turn(self): #do zmiany system tury
         if self.status <= len(self.territories):
             result = ['initial', self.status]
         elif self.status <= self.starting_units:
             result = ['initial-reinforce', self.status]
         else:
             turn = self.status - self.starting_units
-            if turn % 3 == 0:
+            if turn % 3 == 1:
                 result = ['deployment', (turn // 3) + 1]
-            elif turn % 3 == 1:
+            elif turn % 3 == 2:
                 result = ['attack', (turn // 3) + 1]
             else:
                 result = ['fortify', (turn // 3) + 1]
@@ -133,10 +133,7 @@ class Board:
         self.status += 1
 
     def player_territories(self, player):
-        terlist = []
-        for key, ter in self.territories.items():
-            if ter.get_owner() == player:
-                terlist.append(ter.get_name())
+        terlist = [ter for key, ter in self.territories.items() if ter.get_owner() == player]
         return terlist
 
     def set_owner(self, territory, new_owner, armies):

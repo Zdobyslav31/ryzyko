@@ -21,6 +21,7 @@ def create_map(players, map_name):
         (eriador, forodwaith),
         (eriador, enedwaith),
         (enedwaith, moria),
+        (enedwaith, rohan),
         (forodwaith, rhovanion),
         (moria, rhovanion),
         (moria, rohan),

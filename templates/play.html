@@ -17,10 +17,11 @@
         {% endif %}
     </div>
     <div class="board-container">
+        <div>
         <img class="board" src="{{ url_for('static', filename=map+'/mapa.png') }}">
         {% for territory in territories %}
             {% if territory[0] in active_territories %}
-                <a href="{{ url_for('play') }}/{{ turn[0] }}/{{ territory[0] }}">
+                <a href="{{ url_for('play') }}/{{ turn[0] }}/{% if chosen_territory %}{{ chosen_territory }}/{% endif %}{{ territory[0] }}">
             {% endif %}
             <div id="{{ territory[0] }}" class="circle {{ territory[1] }}" >{{ territory[2] }}</div>
             {% if territory[0] in active_territories %}
@@ -30,6 +31,12 @@
         {% for continent in continents %}
             <div id="{{ continent[0] }}" class="circle continental {{ continent[1] }}" >{{ continent[2] }}</div>
         {% endfor %}
+        </div>
+        <div class="options">
+            {% if turn[0] == 'attack' %}
+                <a href="{{ url_for('newturn') }}"><button>Zakończ ataki</button></a>
+            {% endif %}
+        </div>
     </div>
 </body>
 </html>

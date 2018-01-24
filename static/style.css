@@ -6,7 +6,13 @@
 }
 
 .board-container {
-	position: absolute;
+	position: relative;
+    margin: 20px;
+}
+
+.options {
+	position: relative;
+    left: 1020px;
 }
 
 .circle {
