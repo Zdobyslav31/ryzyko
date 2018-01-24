@@ -8,7 +8,7 @@
 </head>
 <body>
     Phase: {{ turn[0] }}, active player: {{ player }}, total turn: {{ turn[1] }}<br>
-    {% if turn[0] == 'initial' %}
+    {% if turn[0] == 'initial' or turn[0] == 'initial-reinforce' %}
         Units left: {{ units_left }}
     {% endif %}
     <div class="board-container">

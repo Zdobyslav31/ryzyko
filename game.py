@@ -12,16 +12,22 @@ def game(board):
             active_player = board.active_player()
         elif turn[0] == 'initial-reinforce':
             board.new_turn()
+            active_player = board.active_player()
         elif turn[0] == 'deploy':
             board.new_turn()
+            active_player = board.active_player()
         elif turn[0] == 'attack-chose':
             board.new_turn()
+            active_player = board.active_player()
         elif turn[0] == 'attack-commit':
             board.new_turn()
-        elif turn[0] == 'fortelify-chose':
+            active_player = board.active_player()
+        elif turn[0] == 'fortify-chose':
             board.new_turn()
+            active_player = board.active_player()
         elif turn[0] == 'fortify-commit':
             board.new_turn()
+            active_player = board.active_player()
         else:
             return 'Error!'
 
@@ -29,7 +35,7 @@ def game(board):
         if turn[0] == 'initial':
             return render_initial(board)
         if turn[0] == 'initial-reinforce':
-            return render_initial(board)
+            return render_initial_reinforce(board)
         if turn[0] == 'deploy':
             pass
         if turn[0] == 'attack-chose':
@@ -43,7 +49,13 @@ def game(board):
 
 
 def render_initial(board):
-    active_territories = board.player_territories('player' + str(board.active_player()))
-    active_territories += board.player_territories('noplayer')
+    active_territories = board.player_territories('noplayer')
+    pickle.dump(board, open('board.pkl', 'wb'))
+    return render_board(board, active_territories)
+
+
+def render_initial_reinforce(board):
+    active_player = board.active_player()
+    active_territories = board.player_territories(active_player)
     pickle.dump(board, open('board.pkl', 'wb'))
     return render_board(board, active_territories)

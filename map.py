@@ -23,6 +23,12 @@ class Territory:
         else:
             return 'noplayer'
 
+    def repr_owner(self):
+        if self.player:
+            return 'player' + str(self.player.get_id())
+        else:
+            return 'noplayer'
+
     def get_neighbours(self):
         return self.connections
 
@@ -67,13 +73,13 @@ class Board:
         self.continents = continentlist
         self.players = {}
         self.status = 1
-        self.starting_units = sum(unitchart.values())
         units = unitchart[len(playerslist)]
         for key, player in playerslist.items():
             if player[0] == 'self-player':
                 self.players['player'+str(key)] = Human(key, player[1], units)
             elif player[0] == 'ai-player':
                 self.players['player'+str(key)] = Computer(key, player[1], units)
+        self.starting_units = len(playerslist) * units
 
     def get_map_name(self):
         return self.map_name
@@ -81,7 +87,7 @@ class Board:
     def get_territories(self):
         terlist = []
         for key, ter in self.territories.items():
-            terlist.append([ter.get_name(), ter.get_owner(), ter.get_strength()])
+            terlist.append([ter.get_name(), ter.repr_owner(), ter.get_strength()])
         return terlist
 
     def get_continents(self):
@@ -106,7 +112,7 @@ class Board:
         return result
 
     def active_player(self):
-        if self.status <= len(self.territories):
+        if self.status <= self.starting_units:
             id = self.status % len(self.players)
         else:
             turn = self.status - self.starting_units
@@ -130,7 +136,7 @@ class Board:
         old_owner = territory.get_owner()
         if old_owner != 'noplayer':
             old_owner.abandon_territory(territory)
-        self.players[new_owner].possess_territory(territory)
+        new_owner.possess_territory(territory)
         territory.set_owner(new_owner, armies)
 
     def units_left(self):

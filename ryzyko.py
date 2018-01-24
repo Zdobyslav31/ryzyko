@@ -25,15 +25,12 @@ def choose_players():
         return redirect(url_for('customize'))
 
 
-
-
-
 @app.route('/play/initial/<territory>', methods=['GET', 'POST'])
 def initial(territory=None):
     board = pickle.load(open('board.pkl', 'rb'))
     active_player = board.active_player()
     if board.territories[territory].get_owner() == 'noplayer':
-        board.set_owner(territory, 'player' + str(active_player.get_id()), 1)
+        board.set_owner(territory, active_player, 1)
         active_player.decrease_units(1)
     else:
         return 'Action not allowed!'
@@ -41,7 +38,21 @@ def initial(territory=None):
     board.new_turn()
     pickle.dump(board, open('board.pkl', 'wb'))
 
-    # return game(board)
+    return game.game(board)
+
+
+@app.route('/play/initial-reinforce/<territory>', methods=['GET', 'POST'])
+def initial_reinforce(territory=None):
+    board = pickle.load(open('board.pkl', 'rb'))
+    active_player = board.active_player()
+    if board.territories[territory].get_owner() == board.active_player():
+        board.territories[territory].reinforce(1)
+        active_player.decrease_units(1)
+    else:
+        return 'Action not allowed!'
+
+    board.new_turn()
+    pickle.dump(board, open('board.pkl', 'wb'))
 
     return game.game(board)
 
