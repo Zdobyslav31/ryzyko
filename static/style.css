@@ -21,10 +21,6 @@
 	box-shadow: inset 0px 0px 5px 1px rgba(0,0,0,0.41);
 }
 
-.circle:hover {
-	color: white;
-}
-
 .continental {
     border-radius: 10%;
 	width: 33px;
@@ -79,4 +75,25 @@
 .player6 {
     background: lightgrey;
     border: 1px solid grey;
+}
+
+
+a >div.circle {
+	color: white;
+	text-decoration: none;
+	-webkit-box-shadow: 0px 0px 5px 1px rgba(255,255,255,0.41);
+	-moz-box-shadow: 0px 0px 5px 1px rgba(255,255,255,0.41);
+	box-shadow: 0px 0px 5px 1px rgba(255,255,255,0.41);
+}
+
+a >div.circle.noplayer {
+	color: black;
+	text-decoration: none;
+	-webkit-box-shadow: inset 0px 0px 5px 1px rgba(255,255,255,0.41);
+	-moz-box-shadow: inset 0px 0px 5px 1px rgba(255,255,255,0.41);
+	box-shadow: inset 0px 0px 5px 1px rgba(255,255,255,0.41);
+}
+
+a > div.circle:hover {
+	color: darkgray;
 }

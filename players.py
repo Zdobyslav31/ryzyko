@@ -14,6 +14,9 @@ class Player:
     def get_id(self):
         return self.id
 
+    def repr_id(self):
+        return 'player' + str(self.id)
+
     def possess_territory(self, territory):
         self.territory_list.append(territory)
 

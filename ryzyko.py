@@ -33,11 +33,9 @@ def initial(territory=None):
         board.set_owner(territory, active_player, 1)
         active_player.decrease_units(1)
     else:
-        return 'Action not allowed!'
-
+        return game.render_board(board, message='Ruch niedozwolony! W tej fazie możesz zajmować tylko niczyje terytoria.')
     board.new_turn()
     pickle.dump(board, open('board.pkl', 'wb'))
-
     return game.game(board)
 
 
@@ -49,11 +47,19 @@ def initial_reinforce(territory=None):
         board.territories[territory].reinforce(1)
         active_player.decrease_units(1)
     else:
-        return 'Action not allowed!'
-
+        return game.render_board(board, message='Ruch niedozwolony! Miło z Twojej strony,  że chcesz pomóc wrogowi, ale możesz niestety wzmacniać tylko swoje terytoria.')
     board.new_turn()
     pickle.dump(board, open('board.pkl', 'wb'))
+    return game.game(board)
 
+
+@app.route('/play/attack-chose/<territory>', methods=['GET', 'POST'])
+def attack_choose(territory=None):
+    board = pickle.load(open('board.pkl', 'rb'))
+    if board.territories[territory].get_owner() == board.active_player():
+        return game.render_board(board, message='Ruch niedozwolony! Atakujesz własne terytorium, geniuszu?')
+    board.new_turn()
+    pickle.dump(board, open('board.pkl', 'wb'))
     return game.game(board)
 
 
@@ -89,13 +95,7 @@ def new(map_name, players):
     return board
 
 
-def render_board(board, active_territories):
-    return render_template('play.html', map=board.get_map_name(), territories=board.get_territories(),
-                           continents=board.get_continents(), turn=board.turn(), player=board.active_player().get_name(),
-                           active_territories=active_territories, units_left=board.active_player().get_units())
-
-
 if __name__ == '__main__':
     app.secret_key = os.urandom(24)
-    app.run()
+    app.run()   #tu jako parametry host, port, debug - przykłady na wierzbie /home/zajecia/interfejs
 
