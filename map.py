@@ -62,6 +62,14 @@ class Continent:
                 owner = 'noplayer'
         return owner
 
+
+    def repr_owner(self):
+        owner = self.territories[0].repr_owner()
+        for ter in self.territories:
+            if ter.repr_owner() != owner:
+                owner = 'noplayer'
+        return owner
+
     def get_units(self):
         return self.units
 
@@ -93,7 +101,7 @@ class Board:
     def get_continents(self):
         conlist = []
         for key, con in self.continents.items():
-            conlist.append([con.get_name(), con.get_owner(), con.get_units()])
+            conlist.append([con.get_name(), con.repr_owner(), con.get_units()])
         return conlist
 
     def turn(self):
