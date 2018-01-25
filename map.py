@@ -45,6 +45,17 @@ class Territory:
     def weaken(self, diff):
         self.armies -= diff
 
+    def get_connected(self, connected=None):
+        if connected is None:
+            connected=set()
+        connected.add(self)
+        for ter in self.connections:
+            if ter.get_owner() == self.player and ter not in connected:
+                connected = connected | ter.get_connected(connected)
+        return connected
+
+
+
 
 class Continent:
     def __init__(self, name, territorylist, units):
@@ -61,7 +72,6 @@ class Continent:
             if ter.get_owner() != owner:
                 owner = 'noplayer'
         return owner
-
 
     def repr_owner(self):
         owner = self.territories[0].repr_owner()
@@ -123,7 +133,7 @@ class Board:
         if self.status <= self.starting_units:
             id = self.status % len(self.players)
         else:
-            turn = self.status - self.starting_units
+            turn = self.status - self.starting_units -1
             id = ((turn // 3) + 1) % len(self.players)
         if id == 0:
             id = len(self.players)
@@ -148,6 +158,16 @@ class Board:
         units = 0
         for key, player in self.players.items():
             units += player.get_units()
+
+    def count_reinforcements(self):
+        player = self.active_player()
+        reinforcments = len(self.player_territories(player)) // 3
+        if reinforcments < 3:
+            reinforcments = 3
+        for key, con in self.continents.items():
+            if con.get_owner() == player:
+                reinforcments += con.get_units()
+        return reinforcments
 
 
 def set_connections(*connections):

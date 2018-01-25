@@ -10,7 +10,8 @@ messages = {
     'illegal-too-little': 'Ruch niedozwolony! Masz za mało wojska na tym terytorium, by atakować',
     'illegal-attack-self': 'Ruch niedozwolony! Atakujesz własne terytorium?',
     'illegal-movement': 'Ruch niedozwolony! Aby dotrzeć do tego terytorium, musiałbyś wytrenować spadochroniarzy. Ale nie ma ich w tej grze.',
-    'wrong-phase': 'Zaraz, coś tu nie gra... Czy aby nie pomyliłeś fazy gry?'
+    'wrong-phase': 'Zaraz, coś tu nie gra... Czy aby nie pomyliłeś fazy gry?',
+    'chose-cancelled': 'Wybór prowincji anulowany'
 }
 
 @app.route('/')
@@ -70,7 +71,7 @@ def deploy(territory):
         active_player.decrease_units(1)
     else:
         return game.render_board(board, message=messages['illegal-deployment'])
-    if active_player.get_units() == 0:
+    if active_player.get_units() <= 0:
         board.new_turn()
     pickle.dump(board, open('board.pkl', 'wb'))
     return game.game(board)
@@ -92,6 +93,8 @@ def attack_commit(territory_from, territory_to):
     board = pickle.load(open('board.pkl', 'rb'))
     territory_from = board.territories[territory_from]
     territory_to = board.territories[territory_to]
+    if territory_to == territory_from:
+        return game.render_board(board, message=messages['chose-cancelled'])
     # do zrobienia: sprawdzenie poprawności, atak
     pickle.dump(board, open('board.pkl', 'wb'))
     return game.game(board)
@@ -104,7 +107,7 @@ def fortify_choose(territory):
     if territory.get_owner() != board.active_player():
         return game.render_board(board, message=messages['illegal-chose'])
     if territory.get_strength() == 1:
-        return game.render_board(board, messages['illegal-too-little'])
+        return game.render_board(board, message=messages['illegal-too-little'])
     pickle.dump(board, open('board.pkl', 'wb'))
     return game.render_board(board, chosen_territory=territory)
 
@@ -113,8 +116,11 @@ def fortify_commit(territory_from, territory_to):
     board = pickle.load(open('board.pkl', 'rb'))
     territory_from = board.territories[territory_from]
     territory_to = board.territories[territory_to]
+    if territory_to == territory_from:
+        return game.render_board(board, message=messages['chose-cancelled'])
     # do zrobienia: sprawdzenie poprawności, fortyfikacja
     board.new_turn()
+    board.active_player().increase_units(board.count_reinforcements())  #tymczasowo, docelowo ma być rozdzielenie board.status na board.round i board.turn, bo na razie działa tylko po poprawnym fortify
     pickle.dump(board, open('board.pkl', 'wb'))
     return game.game(board)
 
@@ -131,10 +137,9 @@ def newgame():
 
 
 @app.route('/newturn', methods=['GET'])
-def attacks_ended():
+def newturn():
     board = pickle.load(open('board.pkl', 'rb'))
     board.new_turn()
-    # liczenie wzmocnień dla aktywnego gracza: board.count_reinforces(player)
     pickle.dump(board, open('board.pkl', 'wb'))
     return game.game(board)
 

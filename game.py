@@ -14,7 +14,7 @@ def game(board):
         elif turn[0] == 'initial-reinforce':
             board.new_turn()
             active_player = board.active_player()
-        elif turn[0] == 'deploy':
+        elif turn[0] == 'deployment':
             board.new_turn()
             active_player = board.active_player()
         elif turn[0] == 'attack':
@@ -38,19 +38,21 @@ def render_board(board, chosen_territory=None, message=None):
         active_territories = [ter.get_name() for ter in board.player_territories('noplayer')]
     if turn[0] == 'initial-reinforce':
         active_territories = [ter.get_name() for ter in board.player_territories(active_player)]
-    if turn[0] == 'deploy':
+    if turn[0] == 'deployment':
         active_territories = [ter.get_name() for ter in board.player_territories(active_player)]
     if turn[0] == 'attack':
         if chosen_territory:
             active_territories = [ter.get_name() for ter in chosen_territory.get_neighbours()
-                                  if ter.get_owner() != board.active_player()]
+                                  if ter.get_owner() != board.active_player()] + [chosen_territory.get_name()]
         else:
-            active_territories = [ter.get_name() for ter in board.player_territories(active_player) if ter.get_strength() > 1]
+            active_territories = [ter.get_name() for ter in board.player_territories(active_player)
+                                  if ter.get_strength() > 1]
     if turn[0] == 'fortify':
         if chosen_territory:
-            pass #do zaimplementowania metoda rekurencyjnie znajdująca terytoria do których można zrobić fortify
+            active_territories = [ter.get_name() for ter in list(chosen_territory.get_connected())]
         else:
-            active_territories = [ter.get_name() for ter in board.player_territories(active_player)]
+            active_territories = [ter.get_name() for ter in board.player_territories(active_player)
+                                  if ter.get_strength() > 1 and len(ter.get_connected()) > 1]
 
 
     pickle.dump(board, open('board.pkl', 'wb'))

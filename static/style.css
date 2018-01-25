@@ -84,20 +84,30 @@
 }
 
 
-a >div.circle {
+a > div.circle {
 	color: white;
 	text-decoration: none;
+    border: 1px solid white;
 	-webkit-box-shadow: 0px 0px 5px 1px rgba(255,255,255,0.41);
 	-moz-box-shadow: 0px 0px 5px 1px rgba(255,255,255,0.41);
 	box-shadow: 0px 0px 5px 1px rgba(255,255,255,0.41);
 }
 
-a >div.circle.noplayer {
+a > div.circle.noplayer {
 	color: black;
 	text-decoration: none;
 	-webkit-box-shadow: inset 0px 0px 5px 1px rgba(255,255,255,0.41);
 	-moz-box-shadow: inset 0px 0px 5px 1px rgba(255,255,255,0.41);
 	box-shadow: inset 0px 0px 5px 1px rgba(255,255,255,0.41);
+}
+
+a > div.circle.chosen {
+	color: black;
+    border: 1px solid white;
+	text-decoration: none;
+	-webkit-box-shadow: 0px 0px 10px 1px rgba(255,255,255,0.8);
+	-moz-box-shadow: 0px 0px 10px 1px rgba(255,255,255,0.8);
+	box-shadow: 0px 0px 5px 10px rgba(255,255,255,0.8);
 }
 
 a > div.circle:hover {
