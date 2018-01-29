@@ -54,6 +54,13 @@ class Territory:
                 connected = connected | ter.get_connected(connected)
         return connected
 
+    def is_border(self):
+        for ter in self.connections:
+            if ter.get_owner() != self.player:
+                return True
+        return False
+
+
 
 
 
@@ -90,7 +97,8 @@ class Board:
         self.territories = territorylist
         self.continents = continentlist
         self.players = {}
-        self.status = 1
+        self.turn = 0
+        self.phase = 1
         units = unitchart[len(playerslist)]
         for key, player in playerslist.items():
             if player[0] == 'self-player':
@@ -113,34 +121,48 @@ class Board:
         for key, con in self.continents.items():
             conlist.append([con.get_name(), con.repr_owner(), con.get_units()])
         return conlist
-
-    def turn(self): #do zmiany system tury
-        if self.status <= len(self.territories):
-            result = ['initial', self.status]
-        elif self.status <= self.starting_units:
-            result = ['initial-reinforce', self.status]
-        else:
-            turn = self.status - self.starting_units
-            if turn % 3 == 1:
-                result = ['deployment', (turn // 3) + 1]
-            elif turn % 3 == 2:
-                result = ['attack', (turn // 3) + 1]
+    
+    def get_phase(self):
+        if self.turn == 0:
+            if self.phase <= len(self.territories):
+                return 'initial'
             else:
-                result = ['fortify', (turn // 3) + 1]
-        return result
+                return 'initial-reinforce'
+        else:
+            if self.phase == 0:
+                return 'deployment'
+            elif self.phase == 1:
+                return 'attack'
+            elif self.phase == 2:
+                return 'fortify'
+            else:
+                return 'wrong phase!'
+
+    def get_round(self):
+        return (self.turn + 2) // 3
 
     def active_player(self):
-        if self.status <= self.starting_units:
-            id = self.status % len(self.players)
+        if self.turn == 0:
+            id = self.phase % len(self.players)
         else:
-            turn = self.status - self.starting_units -1
-            id = ((turn // 3) + 1) % len(self.players)
+            id = self.turn % len(self.players)
         if id == 0:
             id = len(self.players)
         return self.players['player' + str(id)]
 
     def new_turn(self):
-        self.status += 1
+        self.phase = 0
+        self.turn += 1
+        self.active_player().increase_units(self.count_reinforcements())
+
+    def new_phase(self):
+        self.phase += 1
+        if self.turn == 0:
+            if self.units_left() <= 0:
+                self.new_turn()
+        else:
+            if self.phase > 2:
+                self.new_turn()
 
     def player_territories(self, player):
         terlist = [ter for key, ter in self.territories.items() if ter.get_owner() == player]
@@ -158,6 +180,7 @@ class Board:
         units = 0
         for key, player in self.players.items():
             units += player.get_units()
+        return units
 
     def count_reinforcements(self):
         player = self.active_player()

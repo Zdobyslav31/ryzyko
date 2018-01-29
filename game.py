@@ -4,24 +4,24 @@ import pickle
 
 
 def game(board):
-    turn = board.turn()
+    phase = board.get_phase()
     active_player = board.active_player()
 
     while type(active_player) is Computer:
-        if turn[0] == 'initial':
-            board.new_turn()
+        if phase == 'initial':
+            board.new_phase()
             active_player = board.active_player()
-        elif turn[0] == 'initial-reinforce':
-            board.new_turn()
+        elif phase == 'initial-reinforce':
+            board.new_phase()
             active_player = board.active_player()
-        elif turn[0] == 'deployment':
-            board.new_turn()
+        elif phase == 'deployment':
+            board.new_phase()
             active_player = board.active_player()
-        elif turn[0] == 'attack':
-            board.new_turn()
+        elif phase == 'attack':
+            board.new_phase()
             active_player = board.active_player()
-        elif turn[0] == 'fortify':
-            board.new_turn()
+        elif phase == 'fortify':
+            board.new_phase()
             active_player = board.active_player()
         else:
             return 'Error!'
@@ -31,23 +31,29 @@ def game(board):
 
 
 def render_board(board, chosen_territory=None, message=None):
-    turn = board.turn()
+    phase = board.get_phase()
     active_player = board.active_player()
     active_territories = []
-    if turn[0] == 'initial':
+    if phase == 'initial':
+        if active_player.get_units() <= 0:
+            return game(board)
         active_territories = [ter.get_name() for ter in board.player_territories('noplayer')]
-    if turn[0] == 'initial-reinforce':
+    if phase == 'initial-reinforce':
+        if active_player.get_units() <= 0:
+            return game(board)
         active_territories = [ter.get_name() for ter in board.player_territories(active_player)]
-    if turn[0] == 'deployment':
+    if phase == 'deployment':
+        if active_player.get_units() <= 0:
+            return game(board)
         active_territories = [ter.get_name() for ter in board.player_territories(active_player)]
-    if turn[0] == 'attack':
+    if phase == 'attack':
         if chosen_territory:
             active_territories = [ter.get_name() for ter in chosen_territory.get_neighbours()
                                   if ter.get_owner() != board.active_player()] + [chosen_territory.get_name()]
         else:
             active_territories = [ter.get_name() for ter in board.player_territories(active_player)
-                                  if ter.get_strength() > 1]
-    if turn[0] == 'fortify':
+                                  if ter.get_strength() > 1 and ter.is_border()]
+    if phase == 'fortify':
         if chosen_territory:
             active_territories = [ter.get_name() for ter in list(chosen_territory.get_connected())]
         else:
@@ -60,7 +66,7 @@ def render_board(board, chosen_territory=None, message=None):
         chosen_territory = chosen_territory.get_name()
 
     return render_template('play.html', map=board.get_map_name(), territories=board.get_territories(),
-                           continents=board.get_continents(), turn=board.turn(),
+                           continents=board.get_continents(), phase=board.get_phase(), round=board.get_round(),
                            player=[board.active_player().repr_id(), board.active_player().get_name()],
                            active_territories=active_territories, units_left=board.active_player().get_units(),
                            message=message, chosen_territory=chosen_territory)

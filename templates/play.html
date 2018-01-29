@@ -11,8 +11,8 @@
         {{ message }}<br><br>
     {% endif %}
     <div class="{{ player[0] }}">
-        Phase: {{ turn[0] }}, active player: {{ player[1] }}, total turn: {{ turn[1] }}<br>
-        {% if turn[0] == 'initial' or turn[0] == 'initial-reinforce' or turn[0] == 'deployment' %}
+        Phase: {{ phase }}, active player: {{ player[1] }}, total turn: {{ round }}<br>
+        {% if phase == 'initial' or phase == 'initial-reinforce' or phase == 'deployment' %}
             Units left: {{ units_left }}
         {% endif %}
     </div>
@@ -21,7 +21,7 @@
         <img class="board" src="{{ url_for('static', filename=map+'/mapa.png') }}">
         {% for territory in territories %}
             {% if territory[0] in active_territories %}
-                <a href="{{ url_for('play') }}/{{ turn[0] }}/{% if chosen_territory %}{{ chosen_territory }}/{% endif %}{{ territory[0] }}">
+                <a href="{{ url_for('play') }}/{{ phase }}/{% if chosen_territory %}{{ chosen_territory }}/{% endif %}{{ territory[0] }}">
             {% endif %}
             <div id="{{ territory[0] }}" class="circle {{ territory[1] }}{% if territory[0] == chosen_territory %} chosen{% endif %}" >{{ territory[2] }}</div>
             {% if territory[0] in active_territories %}
@@ -33,9 +33,9 @@
         {% endfor %}
         </div>
         <div class="options">
-            {% if turn[0] == 'attack' %}
+            {% if phase == 'attack' %}
                 <a href="{{ url_for('newturn') }}"><button>Zakończ ataki</button></a>
-            {% elif turn[0] == 'fortify' %}
+            {% elif phase == 'fortify' %}
                 <a href="{{ url_for('newturn') }}"><button>Zakończ rundę bez przenoszenia wojsk</button></a>
             {% endif %}
         </div>

@@ -43,7 +43,7 @@ def initial(territory=None):
         active_player.decrease_units(1)
     else:
         return game.render_board(board, message=messages['illegal-initial'])
-    board.new_turn()
+    board.new_phase()
     pickle.dump(board, open('board.pkl', 'wb'))
     return game.game(board)
 
@@ -57,7 +57,7 @@ def initial_reinforce(territory=None):
         active_player.decrease_units(1)
     else:
         return game.render_board(board, message=messages['illegal-deployment'])
-    board.new_turn()
+    board.new_phase()
     pickle.dump(board, open('board.pkl', 'wb'))
     return game.game(board)
 
@@ -72,7 +72,7 @@ def deploy(territory):
     else:
         return game.render_board(board, message=messages['illegal-deployment'])
     if active_player.get_units() <= 0:
-        board.new_turn()
+        board.new_phase()
     pickle.dump(board, open('board.pkl', 'wb'))
     return game.game(board)
 
@@ -119,8 +119,7 @@ def fortify_commit(territory_from, territory_to):
     if territory_to == territory_from:
         return game.render_board(board, message=messages['chose-cancelled'])
     # do zrobienia: sprawdzenie poprawności, fortyfikacja
-    board.new_turn()
-    board.active_player().increase_units(board.count_reinforcements())  #tymczasowo, docelowo ma być rozdzielenie board.status na board.round i board.turn, bo na razie działa tylko po poprawnym fortify
+    board.new_phase()
     pickle.dump(board, open('board.pkl', 'wb'))
     return game.game(board)
 
@@ -139,7 +138,7 @@ def newgame():
 @app.route('/newturn', methods=['GET'])
 def newturn():
     board = pickle.load(open('board.pkl', 'rb'))
-    board.new_turn()
+    board.new_phase()
     pickle.dump(board, open('board.pkl', 'wb'))
     return game.game(board)
 
