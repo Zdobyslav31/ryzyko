@@ -204,6 +204,7 @@ def new_phase():
     return game.game(board)
 
 
+
 @app.route('/play', methods=['GET'])
 def play():
     """
