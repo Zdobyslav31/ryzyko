@@ -52,7 +52,7 @@ def render_board(board, chosen_territory=None, message=None):
     if phase == 'initial':
         if active_player.get_units() <= 0:
             return game(board)
-        active_territories = [ter.get_name() for ter in board.player_territories('noplayer')]
+        active_territories = [ter.get_name() for ter in board.get_territories() if ter.get_owner() is None]
     if phase == 'initial-reinforce':
         if active_player.get_units() <= 0:
             return game(board)
@@ -79,8 +79,8 @@ def render_board(board, chosen_territory=None, message=None):
     if chosen_territory:
         chosen_territory = chosen_territory.get_name()
 
-    return render_template('play.html', map=board.get_map_name(), territories=board.get_territories(),
-                           continents=board.get_continents(), phase=board.get_phase(), round=board.get_round(),
+    return render_template('play.html', map=board.get_map_name(), territories=board.repr_territories(),
+                           continents=board.repr_continents(), phase=board.get_phase(), round=board.get_round(),
                            player=[board.active_player().repr_id(), board.active_player().get_name()],
                            active_territories=active_territories, units_left=board.active_player().get_units(),
                            message=message, chosen_territory=chosen_territory)

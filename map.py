@@ -211,15 +211,22 @@ class Board:
         Territories getter
         :return: list
         """
+        return [ter for key, ter in self.territories.items()]
+
+    def repr_territories(self):
+        """
+        Writes out name, owner and strength of all territories
+        :return: list of lists
+        """
         terlist = []
         for key, ter in self.territories.items():
             terlist.append([ter.get_name(), ter.repr_owner(), ter.get_strength()])
         return terlist
 
-    def get_continents(self):
+    def repr_continents(self):
         """
-        Continents getter
-        :return: list
+        Writes out name, owner and units of all continents
+        :return: list of lists
         """
         conlist = []
         for key, con in self.continents.items():

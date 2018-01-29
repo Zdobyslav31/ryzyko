@@ -204,6 +204,17 @@ def new_phase():
     return game.game(board)
 
 
+@app.route('/play', methods=['GET'])
+def play():
+    """
+    Just render board
+    In general unused
+    :return: game -> render_template
+    """
+    board = pickle.load(open('board.pkl', 'rb'))
+    return game.game(board)
+
+
 """Funkcje pomocnicze"""
 
 
