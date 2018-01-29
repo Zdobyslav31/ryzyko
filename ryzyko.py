@@ -16,16 +16,29 @@ messages = {
 
 @app.route('/')
 def hello():
+    """
+    Starting screen
+    :return: render_template
+    """
     return render_template('hello.html')
 
 
 @app.route('/customize')
 def customize():
+    """
+    Customize game
+    :return: render_template
+    """
     return render_template('customize.html')
 
 
 @app.route('/choose_players')
 def choose_players():
+    """
+    Choose players
+    gets map_name and players (number)
+    :return: render_template
+    """
     if request.args.get('newgame'):
         map_name = request.args.get('map_name')
         players_num = int(request.args.get('players'))
@@ -36,9 +49,14 @@ def choose_players():
 
 @app.route('/play/initial/<territory>', methods=['GET', 'POST'])
 def initial(territory=None):
+    """
+    Initial controller
+    :param territory: string
+    :return: game -> render_template
+    """
     board = pickle.load(open('board.pkl', 'rb'))
     active_player = board.active_player()
-    if board.territories[territory].get_owner() == 'noplayer':
+    if board.territories[territory].get_owner() == None:
         board.set_owner(territory, active_player, 1)
         active_player.decrease_units(1)
     else:
@@ -50,6 +68,11 @@ def initial(territory=None):
 
 @app.route('/play/initial-reinforce/<territory>', methods=['GET', 'POST'])
 def initial_reinforce(territory=None):
+    """
+    Initial reinforce controller
+    :param territory: string
+    :return: game -> render_template
+    """
     board = pickle.load(open('board.pkl', 'rb'))
     active_player = board.active_player()
     if board.territories[territory].get_owner() == board.active_player():
@@ -64,6 +87,11 @@ def initial_reinforce(territory=None):
 
 @app.route('/play/deployment/<territory>', methods=['GET', 'POST'])
 def deploy(territory):
+    """
+    Deployment controller
+    :param territory: string
+    :return: game -> render_template
+    """
     board = pickle.load(open('board.pkl', 'rb'))
     active_player = board.active_player()
     if board.territories[territory].get_owner() == board.active_player():
@@ -79,6 +107,11 @@ def deploy(territory):
 
 @app.route('/play/attack/<territory>', methods=['GET', 'POST'])
 def attack_choose(territory):
+    """
+    Attack-choosing controller
+    :param territory: string
+    :return: game -> render_template
+    """
     board = pickle.load(open('board.pkl', 'rb'))
     territory = board.territories[territory]
     if territory.get_owner() != board.active_player():
@@ -88,8 +121,15 @@ def attack_choose(territory):
     pickle.dump(board, open('board.pkl', 'wb'))
     return game.render_board(board, chosen_territory=territory)
 
+
 @app.route('/play/attack/<territory_from>/<territory_to>', methods=['GET', 'POST'])
 def attack_commit(territory_from, territory_to):
+    """
+    Attack-committing controller
+    :param territory_from: string
+    :param territory_to: string
+    :return: game -> render_template
+    """
     board = pickle.load(open('board.pkl', 'rb'))
     territory_from = board.territories[territory_from]
     territory_to = board.territories[territory_to]
@@ -102,6 +142,11 @@ def attack_commit(territory_from, territory_to):
 
 @app.route('/play/fortify/<territory>', methods=['GET', 'POST'])
 def fortify_choose(territory):
+    """
+    Fortification-choosing controller
+    :param territory: string
+    :return: game -> render_template
+    """
     board = pickle.load(open('board.pkl', 'rb'))
     territory = board.territories[territory]
     if territory.get_owner() != board.active_player():
@@ -111,8 +156,15 @@ def fortify_choose(territory):
     pickle.dump(board, open('board.pkl', 'wb'))
     return game.render_board(board, chosen_territory=territory)
 
+
 @app.route('/play/fortify/<territory_from>/<territory_to>', methods=['GET', 'POST'])
 def fortify_commit(territory_from, territory_to):
+    """
+    Fortification-committing controller
+    :param territory_from: string
+    :param territory_to: string
+    :return: game -> render_template
+    """
     board = pickle.load(open('board.pkl', 'rb'))
     territory_from = board.territories[territory_from]
     territory_to = board.territories[territory_to]
@@ -126,6 +178,10 @@ def fortify_commit(territory_from, territory_to):
 
 @app.route('/newgame', methods=['GET', 'POST'])
 def newgame():
+    """
+    New game controller
+    :return: game -> render_template
+    """
     players = {}
     for i in range(1,int(request.args.get('players_num')) + 1):
         players[str(i)] = [request.args.get('player' + str(i)), request.args.get('player' + str(i) + 'name')]
@@ -135,23 +191,29 @@ def newgame():
     return game.game(board)
 
 
-@app.route('/newturn', methods=['GET'])
-def newturn():
+@app.route('/new_phase', methods=['GET'])
+def new_phase():
+    """
+    New phase controller
+    Called after finishing attack or omitting fortification
+    :return: game -> render_template
+    """
     board = pickle.load(open('board.pkl', 'rb'))
     board.new_phase()
     pickle.dump(board, open('board.pkl', 'wb'))
     return game.game(board)
 
 
-@app.route('/play', methods=['GET', 'POST'])
-def play():
-    return 'Oooops'
-
-
 """Funkcje pomocnicze"""
 
 
 def new(map_name, players):
+    """
+    New game creator
+    :param map_name: string
+    :param players: dict
+    :return: Board
+    """
     # id = random.randrange(0,100)
     importlib.import_module('static.' + map_name)
     board = importlib.import_module('.board', package='static.' + map_name)

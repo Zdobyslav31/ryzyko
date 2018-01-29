@@ -2,6 +2,12 @@ from map import *
 
 
 def create_map(players, map_name):
+    """
+    Creates map of type MiddleEarth
+    :param players: dict
+    :param map_name: string
+    :return: Board
+    """
     lindon = Territory('lindon', 'Lindon')
     eriador = Territory('eriador', 'Eriador')
     forodwaith = Territory('forodwaith', 'Forodwaith')

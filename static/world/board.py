@@ -2,6 +2,12 @@ from map import *
 
 
 def create_map(players, map_name):
+    """
+    Creates map of type World
+    :param players: dict
+    :param map_name: string
+    :return: Board
+    """
     alaska = Territory('alaska', 'Alaska')
     northwestTer = Territory('northwestTer', 'Northwest Territory')
     greenland = Territory('greenland', 'Greenland')

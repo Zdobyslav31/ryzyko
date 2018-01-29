@@ -34,9 +34,9 @@
         </div>
         <div class="options">
             {% if phase == 'attack' %}
-                <a href="{{ url_for('newturn') }}"><button>Zakończ ataki</button></a>
+                <a href="{{ url_for('new_phase') }}"><button>Zakończ ataki</button></a>
             {% elif phase == 'fortify' %}
-                <a href="{{ url_for('newturn') }}"><button>Zakończ rundę bez przenoszenia wojsk</button></a>
+                <a href="{{ url_for('new_phase') }}"><button>Zakończ rundę bez przenoszenia wojsk</button></a>
             {% endif %}
         </div>
     </div>

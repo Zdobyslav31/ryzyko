@@ -4,6 +4,13 @@ import pickle
 
 
 def game(board):
+    """
+    Main game controller
+    Called after each player's action
+    Handles Computer's actions
+    :param board: Board
+    :return: render_board() -> render_template()
+    """
     phase = board.get_phase()
     active_player = board.active_player()
 
@@ -31,6 +38,14 @@ def game(board):
 
 
 def render_board(board, chosen_territory=None, message=None):
+    """
+    Board renderer
+    Renders board for player according to phase
+    :param board:
+    :param chosen_territory: Territory
+    :param message: string
+    :return: render_template()
+    """
     phase = board.get_phase()
     active_player = board.active_player()
     active_territories = []
@@ -59,7 +74,6 @@ def render_board(board, chosen_territory=None, message=None):
         else:
             active_territories = [ter.get_name() for ter in board.player_territories(active_player)
                                   if ter.get_strength() > 1 and len(ter.get_connected()) > 1]
-
 
     pickle.dump(board, open('board.pkl', 'wb'))
     if chosen_territory:
