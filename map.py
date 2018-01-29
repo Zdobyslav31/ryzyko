@@ -1,4 +1,5 @@
 from players import Player, Human, Computer
+import random
 
 
 class Territory:
@@ -98,6 +99,14 @@ class Territory:
         :return: void
         """
         self.armies -= diff
+
+    def set_strength(self, value):
+        """
+        Strength setter
+        :param value: int
+        :return: void
+        """
+        self.armies = value
 
     def get_connected(self, connected=None):
         """
@@ -213,6 +222,14 @@ class Board:
         """
         return [ter for key, ter in self.territories.items()]
 
+    def get_territory(self, name):
+        """
+        Get territory of given full-id
+        :param name: string
+        :return: Territory
+        """
+        return self.territories[name]
+
     def repr_territories(self):
         """
         Writes out name, owner and strength of all territories
@@ -307,15 +324,15 @@ class Board:
         terlist = [ter for key, ter in self.territories.items() if ter.get_owner() == player]
         return terlist
 
-    def set_owner(self, territory, new_owner, armies):
+    def set_owner(self, territory_name, new_owner, armies):
         """
         Sets new owner of a territory
-        :param territory: string
+        :param territory_name: string
         :param new_owner: Player
         :param armies: int
         :return: void
         """
-        territory = self.territories[territory]
+        territory = self.territories[territory_name]
         old_owner = territory.get_owner()
         if old_owner:
             old_owner.abandon_territory(territory)
@@ -345,6 +362,69 @@ class Board:
             if con.get_owner() == player:
                 reinforcments += con.get_units()
         return reinforcments
+
+    def attack(self, ter_attack, ter_defence, units):
+        """
+        Cast an attack
+        :param ter_attack: Territory
+        :param ter_defence: Territory
+        :param units: int
+        :return message: string
+        """
+        attacking_units = units
+        ter_attack.weaken(units)
+        defending_units = ter_defence.get_strength()
+
+        while attacking_units and defending_units:
+            attacker_dices = []
+            for i in range(attacking_units):
+                attacker_dices.append(random.randrange(1, 6))
+            defender_dices = []
+            for i in range(defending_units):
+                defender_dices.append(random.randrange(1, 6))
+            for i in range(min(len(attacker_dices), len(defender_dices))):
+                if attacker_dices[i] > defender_dices[i]:
+                    defending_units -= 1
+                else:
+                    attacking_units -= 1
+        if attacking_units:
+            self.set_owner(ter_defence.get_name(), ter_attack.get_owner(), attacking_units)
+            return 'attack-success'
+        else:
+            ter_defence.set_strength(defending_units)
+            return 'attack-fail'
+
+    def check_elimination(self):
+        """
+        Checks if any player is eliminated. If there is only one player left, returns True
+        :return: bool
+        """
+        players_alive = len(self.players)
+        for key, player in self.players.items():
+            if player.check_for_elimination():
+                players_alive -= 1
+        if players_alive == 1:
+            return True
+        return False
+
+    def alive_players(self):
+        """
+        Returns list of players not yet eliminated
+        :return: list
+        """
+        return [player for key, player in self.players.items() if player.is_eliminated() is False]
+
+
+    def fortify(self, ter_from, ter_to, units):
+        """
+        Move units
+        :param ter_from: Territory
+        :param ter_to: Territory
+        :param units: int
+        :return: void
+        """
+        ter_from.weaken(units)
+        ter_to.reinforce(units)
 
 
 def set_connections(*connections):

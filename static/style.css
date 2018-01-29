@@ -15,6 +15,33 @@
     left: 1020px;
 }
 
+.question_box {
+	position: relative;
+	left: 300px;
+	top: 200px;
+	padding: 20px;
+	width: 400px;
+	text-align: center;
+	z-index: 99;
+	-webkit-box-shadow: inset 0px 0px 5px 1px rgba(0,0,0,0.41);
+	-moz-box-shadow: inset 0px 0px 5px 1px rgba(0,0,0,0.41);
+	box-shadow: inset 0px 0px 5px 1px rgba(0,0,0,0.41);
+}
+
+.end_box {
+	position: relative;
+	left: 200px;
+	top: 200px;
+	padding: 20px;
+	width: 600px;
+	height: 200px;
+	text-align: center;
+	z-index: 99;
+	-webkit-box-shadow: inset 0px 0px 5px 1px rgba(0,0,0,0.41);
+	-moz-box-shadow: inset 0px 0px 5px 1px rgba(0,0,0,0.41);
+	box-shadow: inset 0px 0px 5px 1px rgba(0,0,0,0.41);
+}
+
 .circle {
 	width: 20px;
     height: 20px;

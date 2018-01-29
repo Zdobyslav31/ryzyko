@@ -11,6 +11,7 @@ class Player:
         self.name = name
         self.units = units
         self.territory_list = []
+        self.eliminated = False
 
     def get_units(self):
         """
@@ -72,7 +73,21 @@ class Player:
         """
         self.units -= number
 
+    def check_for_elimination(self):
+        """
+        Checks if player is eliminated and if so, changes value and returns
+        :return: bool
+        """
+        if len(self.territory_list) == 0:
+            self.eliminated = True
+        return self.eliminated
 
+    def is_eliminated(self):
+        """
+        Checks if player is eliminated but doesn't change the value
+        :return: bool
+        """
+        return self.eliminated
 
 class Human(Player):
     """Class Human Player"""

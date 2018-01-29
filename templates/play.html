@@ -11,7 +11,7 @@
         {{ message }}<br><br>
     {% endif %}
     <div class="{{ player[0] }}">
-        Phase: {{ phase }}, active player: {{ player[1] }}, total turn: {{ round }}<br>
+        Faza: {{ phase }}, Gracz aktywny: {{ player[1] }}, Runda: {{ round }}<br>
         {% if phase == 'initial' or phase == 'initial-reinforce' or phase == 'deployment' %}
             Units left: {{ units_left }}
         {% endif %}
@@ -32,6 +32,21 @@
             <div id="{{ continent[0] }}" class="circle continental {{ continent[1] }}" >{{ continent[2] }}</div>
         {% endfor %}
         </div>
+        {% if question_box %}
+        <div class="question_box {{ player[0] }}">
+            {% if phase == 'attack' %}
+                Atakujesz {{ question_box[1] }} z {{ question_box[0] }}
+            {% else %}
+                Przenosisz wojska z {{ question_box[0] }} do {{ question_box[1] }}
+            {% endif %}
+            <br>
+            <form action="{{ url_for('play') }}/{{ phase }}/{{ chosen_territory }}/{{ destination_territory }}">
+                <label for="units">Ilu jednostek chcesz użyć do tego ruchu?</label>
+                <input type="number" name="units" min="1" max="{{ question_box[2] }}" value="{{ question_box[2] }}">
+                <input type="submit" value="Wykonaj!">
+            </form>
+        </div>
+        {% endif %}
         <div class="options">
             {% if phase == 'attack' %}
                 <a href="{{ url_for('new_phase') }}"><button>Zakończ ataki</button></a>

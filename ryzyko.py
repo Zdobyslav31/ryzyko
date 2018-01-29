@@ -11,8 +11,11 @@ messages = {
     'illegal-attack-self': 'Ruch niedozwolony! Atakujesz własne terytorium?',
     'illegal-movement': 'Ruch niedozwolony! Aby dotrzeć do tego terytorium, musiałbyś wytrenować spadochroniarzy. Ale nie ma ich w tej grze.',
     'wrong-phase': 'Zaraz, coś tu nie gra... Czy aby nie pomyliłeś fazy gry?',
-    'chose-cancelled': 'Wybór prowincji anulowany'
+    'chose-cancelled': 'Wybór prowincji anulowany',
+    'attack-success': 'Atak zakończył się powodzeniem',
+    'attack-fail': 'Niestety, atak zakończył się porażką'
 }
+
 
 @app.route('/')
 def hello():
@@ -118,7 +121,6 @@ def attack_choose(territory):
         return game.render_board(board, message=messages['illegal-chose'])
     if territory.get_strength() == 1:
         return game.render_board(board, message=messages['illegal-too-little'])
-    pickle.dump(board, open('board.pkl', 'wb'))
     return game.render_board(board, chosen_territory=territory)
 
 
@@ -135,9 +137,19 @@ def attack_commit(territory_from, territory_to):
     territory_to = board.territories[territory_to]
     if territory_to == territory_from:
         return game.render_board(board, message=messages['chose-cancelled'])
-    # do zrobienia: sprawdzenie poprawności, atak
-    pickle.dump(board, open('board.pkl', 'wb'))
-    return game.game(board)
+
+    if request.args.get('units'):
+        units = int(request.args.get('units'))
+        # do zrobienia: sprawdzenie poprawności
+        message = messages[board.attack(territory_from, territory_to, units)]
+        if board.check_elimination():
+            pickle.dump(board, open('board.pkl', 'wb'))
+            return end_game()
+        pickle.dump(board, open('board.pkl', 'wb'))
+        return game.render_board(board, message=message)
+    else:
+        # do zrobienia: sprawdzenie poprawności
+        return game.render_board(board, chosen_territory=territory_from, destination_territory=territory_to)
 
 
 @app.route('/play/fortify/<territory>', methods=['GET', 'POST'])
@@ -170,10 +182,17 @@ def fortify_commit(territory_from, territory_to):
     territory_to = board.territories[territory_to]
     if territory_to == territory_from:
         return game.render_board(board, message=messages['chose-cancelled'])
-    # do zrobienia: sprawdzenie poprawności, fortyfikacja
-    board.new_phase()
-    pickle.dump(board, open('board.pkl', 'wb'))
-    return game.game(board)
+
+    if request.args.get('units'):
+        units = int(request.args.get('units'))
+        # do zrobienia: sprawdzenie poprawności
+        board.fortify(territory_from, territory_to, units)
+        board.new_phase()
+        pickle.dump(board, open('board.pkl', 'wb'))
+        return game.game(board)
+    else:
+        # do zrobienia: sprawdzenie poprawności
+        return game.render_board(board, chosen_territory=territory_from, destination_territory=territory_to)
 
 
 @app.route('/newgame', methods=['GET', 'POST'])
@@ -215,6 +234,19 @@ def play():
     return game.game(board)
 
 
+@app.route('/end_game', methods=['GET'])
+def end_game():
+    """
+    Render board after game finishes
+    :return: game -> render_template
+    """
+    board = pickle.load(open('board.pkl', 'rb'))
+    winner = board.alive_players()[0]
+    return render_template('end_game.html', map=board.get_map_name(), territories=board.repr_territories(),
+                           continents=board.repr_continents(),
+                           round=board.get_round(), player=[winner.repr_id(), winner.get_name()])
+
+
 """Funkcje pomocnicze"""
 
 
@@ -236,5 +268,5 @@ def new(map_name, players):
 
 if __name__ == '__main__':
     app.secret_key = os.urandom(24)
-    app.run()   #tu jako parametry host, port, debug - przykłady na wierzbie /home/zajecia/interfejs
+    app.run()   # tu jako parametry host, port, debug - przykłady na wierzbie /home/zajecia/interfejs
 

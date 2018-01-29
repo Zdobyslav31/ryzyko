@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Ryzyko</title>
+    <link rel=stylesheet type=text/css href="{{ url_for('static', filename='style.css') }}">
+    <link rel=stylesheet type=text/css href="{{ url_for('static', filename=map + '/style.css') }}">
+</head>
+<body>
+    <div class="board-container">
+        <div>
+        <img class="board" src="{{ url_for('static', filename=map+'/mapa.png') }}">
+        {% for territory in territories %}
+            <div id="{{ territory[0] }}" class="circle {{ territory[1] }}{% if territory[0] == chosen_territory %} chosen{% endif %}" >{{ territory[2] }}</div>
+        {% endfor %}
+        {% for continent in continents %}
+            <div id="{{ continent[0] }}" class="circle continental {{ continent[1] }}" >{{ continent[2] }}</div>
+        {% endfor %}
+        </div>
+        <div class="end_box {{ player[0] }}">
+            <h1><small>Koniec gry</small></h1>
+            Gra zakończyła się po {{ round }} ruchach.<br>
+            Zwycięzca: {{ player[1] }}<br>
+            <a href="{{ url_for('hello') }}"><button>Zagraj jeszcze raz</button></a>
+        </div>
+    </div>
+</body>
+</html>
