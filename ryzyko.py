@@ -268,5 +268,5 @@ def new(map_name, players):
 
 if __name__ == '__main__':
     app.secret_key = os.urandom(24)
-    app.run()   # tu jako parametry host, port, debug - przykłady na wierzbie /home/zajecia/interfejs
+    app.run(port=5017)   # tu jako parametry host, port, debug - przykłady na wierzbie /home/zajecia/interfejs
 
