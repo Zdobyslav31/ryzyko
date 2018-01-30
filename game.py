@@ -80,6 +80,9 @@ def render_board(board, chosen_territory=None, destination_territory=None, messa
         else:
             active_territories = [ter.get_name() for ter in board.player_territories(active_player)
                                   if ter.get_strength() > 1 and ter.is_border()]
+            if len(active_territories) == 0:
+                board.new_phase()
+                return game(board)
     if phase == 'fortify':
         if destination_territory:
             question_box = [chosen_territory.get_title(), destination_territory.get_title(), chosen_territory.get_strength()-1]
@@ -88,6 +91,9 @@ def render_board(board, chosen_territory=None, destination_territory=None, messa
         else:
             active_territories = [ter.get_name() for ter in board.player_territories(active_player)
                                   if ter.get_strength() > 1 and len(ter.get_connected()) > 1]
+            if len(active_territories) == 0:
+                board.new_phase()
+                return game(board)
 
     pickle.dump(board, open('board.pkl', 'wb'))
     if chosen_territory:
