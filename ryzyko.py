@@ -59,7 +59,7 @@ def initial(territory=None):
     """
     board = pickle.load(open('board.pkl', 'rb'))
     active_player = board.active_player()
-    if board.territories[territory].get_owner() == None:
+    if board.territories[territory].get_owner() is None:
         board.set_owner(territory, active_player, 1)
         active_player.decrease_units(1)
     else:
@@ -141,7 +141,10 @@ def attack_commit(territory_from, territory_to):
     if request.args.get('units'):
         units = int(request.args.get('units'))
         # do zrobienia: sprawdzenie poprawności
-        message = messages[board.attack(territory_from, territory_to, units)]
+        if board.attack(territory_from, territory_to, units):
+            message = messages['attack-success']
+        else:
+            message = messages['attack-fail']
         if board.check_elimination():
             pickle.dump(board, open('board.pkl', 'wb'))
             return end_game()
@@ -202,7 +205,7 @@ def newgame():
     :return: game -> render_template
     """
     players = {}
-    for i in range(1,int(request.args.get('players_num')) + 1):
+    for i in range(1, int(request.args.get('players_num')) + 1):
         players[str(i)] = [request.args.get('player' + str(i)), request.args.get('player' + str(i) + 'name')]
     map_name = request.args.get('map_name')
     board = new(map_name, players)

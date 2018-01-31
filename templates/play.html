@@ -53,6 +53,23 @@
             {% elif phase == 'fortify' %}
                 <a href="{{ url_for('new_phase') }}"><button>Zakończ rundę bez przenoszenia wojsk</button></a>
             {% endif %}
+            {% if log %}
+                {% for turn, actions in log.items() %}
+                    <h1>Ruchy gracza {{ actions['player'] }}</h1>
+                    <h2>Wzmocnienia</h2>
+                    {% for ter, dep in actions['deploy'].items() %}
+                        {{ dep }} jednostek na terytorium {{ ter }}<br>
+                    {% endfor %}
+                    <h2>Ataki</h2>
+                    {% for attack in actions['attack'] %}
+                        Atak {{ attack[2] }} jednostkami z {{ attack[0] }} na {{ attack[1] }} - {% if attack[3] %}sukces{% else %}porażka{% endif %}<br>
+                    {% endfor %}
+                    <h2>Przegrupowania</h2>
+                    {% if actions['fortify'] %}
+                        {{ actions['fortify'][2] }} jednostek z {{ actions['fortify'][0] }} do {{ actions['fortify'][1] }}
+                    {% endif %}
+                {% endfor %}
+            {% endif %}
         </div>
     </div>
 </body>

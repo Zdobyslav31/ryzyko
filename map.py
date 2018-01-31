@@ -1,4 +1,4 @@
-from players import Player, Human, Computer
+from players import *
 import random
 
 
@@ -66,6 +66,13 @@ class Territory:
         :return connections: list
         """
         return self.connections
+
+    def get_enemies(self):
+        """
+        Returns connected territories
+        :return connections: list
+        """
+        return [ter for ter in self.connections if ter.get_owner() != self.player]
 
     def set_owner(self, newowner, armies):
         """
@@ -205,8 +212,9 @@ class Board:
             if player[0] == 'self-player':
                 self.players['player'+str(key)] = Human(key, player[1], units)
             elif player[0] == 'ai-player':
-                self.players['player'+str(key)] = Computer(key, player[1], units)
+                self.players['player'+str(key)] = RandomAI(key, player[1], units)
         self.starting_units = len(playerslist) * units
+        self.log = {}
 
     def get_map_name(self):
         """
@@ -277,6 +285,13 @@ class Board:
         """
         return (self.turn + 2) // 3
 
+    def get_turn(self):
+        """
+        Returns number of the turn
+        :return: int
+        """
+        return self.turn
+
     def active_player(self):
         """
         Returns active player
@@ -297,6 +312,7 @@ class Board:
         Reinforces active player
         :return: void
         """
+        self.log[self.turn] = self.active_player().dump_log()
         self.phase = 0
         self.turn += 1
         self.active_player().increase_units(self.count_reinforcements())
@@ -389,10 +405,10 @@ class Board:
                     attacking_units -= 1
         if attacking_units:
             self.set_owner(ter_defence.get_name(), ter_attack.get_owner(), attacking_units)
-            return 'attack-success'
+            return True
         else:
             ter_defence.set_strength(defending_units)
-            return 'attack-fail'
+            return False
 
     def check_elimination(self):
         """

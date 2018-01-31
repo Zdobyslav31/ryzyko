@@ -1,3 +1,5 @@
+import random
+
 class Player:
     """Abstract class Player"""
     def __init__(self, id, name, units):
@@ -12,6 +14,7 @@ class Player:
         self.units = units
         self.territory_list = []
         self.eliminated = False
+        self.log = {'player': self.name, 'deploy': {}, 'attack': [], 'fortify': ()}
 
     def get_units(self):
         """
@@ -40,6 +43,13 @@ class Player:
         :return: string
         """
         return 'player' + str(self.id)
+
+    def get_terriitories(self):
+        """
+        Territories getter
+        :return: list
+        """
+        return self.territory_list
 
     def possess_territory(self, territory):
         """
@@ -89,11 +99,92 @@ class Player:
         """
         return self.eliminated
 
+    def dump_log(self):
+        log = self.log
+        self.log = {'player': self.name, 'deploy': {}, 'attack': [], 'fortify': ()}
+        return log
+
+    def get_log(self):
+        return self.log
+
+
+
 class Human(Player):
     """Class Human Player"""
     pass
 
 
 class Computer(Player):
-    """Class Computer Player"""
-    pass
+    """Computer Player interface"""
+    def initial(self, board):
+        """
+        Occupies single no-player territory
+        :param board: Board
+        :return: void
+        """
+        territory = self.territory_to_possess(board)
+        board.set_owner(territory.get_name(), self, 1)
+
+    def deploy_once(self, board):
+        territory = self.territory_to_reinforce(board)
+        territory.reinforce(1)
+        self.decrease_units(1)
+        if territory.get_name() in self.log['deploy']:
+            self.log['deploy'][territory.get_name()] += 1
+        else:
+            self.log['deploy'][territory.get_name()] = 1
+
+    def deploy(self, board):
+        while self.units:
+            self.deploy_once(board)
+
+    def cast_attacks(self, board):
+        raise NotImplementedError
+
+    def fortify(self, board):
+        raise NotImplementedError
+
+    def territory_to_possess(self, board):
+        raise NotImplementedError
+
+    def territory_to_reinforce(self, board):
+        raise NotImplementedError
+
+
+class RandomAI(Computer):
+    """Class RandomAI - implementation of Computer Player
+    Makes every mov random"""
+    def territory_to_possess(self, board):
+        territories = [ter for ter in board.get_territories() if ter.get_owner() is None]
+        return self.random_territory(territories)
+
+    def territory_to_reinforce(self, board):
+        territories = self.get_terriitories()
+        ter_id = random.randrange(0, len(territories))
+        return self.random_territory(territories)
+
+    def cast_attacks(self, board):
+        territories = [ter for ter in self.get_terriitories() if ter.is_border() and ter.get_strength() > 1]
+        for ter in territories:
+            if random.getrandbits(1):
+                target = ter.get_enemies()[random.randrange(len(ter.get_enemies()))]
+                units = random.randrange(1, ter.get_strength())
+                success = board.attack(ter, target, units)
+                if success and target.get_strength() > 1:
+                    territories.append(target)
+                self.log['attack'].append((ter.get_title(), target.get_title(), units, success))
+
+    def fortify(self, board):
+        territory_from = self.random_territory([ter for ter in self.territory_list if ter.get_strength() > 1])
+        territory_to = self.random_territory(self.territory_list)
+        units = random.randrange(1, territory_from.get_strength())
+        board.fortify(territory_from, territory_to, units)
+        self.log['fortify'] = (territory_from.get_title(), territory_to.get_title(), units)
+
+    def random_territory(self, territories):
+        ter_id = random.randrange(0, len(territories))
+        return territories[ter_id]
+
+
+
+
