@@ -206,7 +206,7 @@ def newgame():
     """
     players = {}
     for i in range(1, int(request.args.get('players_num')) + 1):
-        players[str(i)] = [request.args.get('player' + str(i)), request.args.get('player' + str(i) + 'name')]
+        players[str(i)] = [request.args.get('player' + str(i)), request.args.get('player' + str(i) + 'name'), request.args.get('player' + str(i) + 'algorithm')]
     map_name = request.args.get('map_name')
     board = new(map_name, players)
     pickle.dump(board, open('board.pkl', 'wb'))

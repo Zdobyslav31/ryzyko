@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <title>Ryzyko - tworzenie nowej gry</title>
+    <script src="http://code.jquery.com/jquery-1.9.1.js"></script>
 </head>
 <body>
     Wybierz graczy
@@ -10,35 +11,38 @@
         <label for="player1">Gracz 1</label>
         <select name="player1">
             <option value="self-player">Ja (ten komputer)</option>
-            <option value="ai-player" disabled>Gracz komputerowy</option>
-            <option value="human-player" disabled>Inny gracz online</option>
         </select>
         <label for="player1name">Imię gracza:</label>
-        <input type="text", name="player1name">
+        <input type="text" name="player1name">
         <br>
-        <label for="player2">Gracz 2</label>
-        <select name="player2">
-            <option value="self-player">Ten komputer</option>
-            <option value="ai-player">Gracz komputerowy</option>
-            <option value="human-player" disabled>Inny gracz online</option>
-        </select>
-        <label for="player2name">Imię gracza:</label>
-        <input type="text", name="player2name">
-        <br>
-        {% for i in range(3,players_num+1) %}
+        {% for i in range(2, players_num + 1) %}
             <label for="player{{ i }}">Gracz {{ i }}</label>
-            <select name="player{{ i }}">
+            <select name="player{{ i }}" onchange="showDiv(this, 'player{{ i }}algorithm')">
                 <option value="self-player">Ten komputer</option>
                 <option value="ai-player">Gracz komputerowy</option>
                 <option value="human-player" disabled>Inny gracz online</option>
             </select>
         <label for="player{{ i }}name">Imię gracza:</label>
-        <input type="text", name="player{{ i }}name">
+        <input type="text" name="player{{ i }}name">
+        <div  id="player{{ i }}algorithm" style="display: none">
+            <label for="player{{ i }}algorithm">Algorytm</label>
+            <select name="player{{ i }}algorithm">
+                <option value="random">RandomAI</option>
+            </select>
+        </div>
         <br>
         {% endfor %}
         <input type="hidden" name="players_num" value="{{ players_num }}">
         <input type="hidden" name="map_name" value="{{ map_name }}">
         <input type="submit" value="Graj!">
     </form>
+    <script>
+        function showDiv(elem, id) {
+            if(elem.value === "ai-player")
+                document.getElementById(id).style.display = "inline";
+            else
+                document.getElementById(id).style.display = "none";
+        }
+    </script>
 </body>
 </html>

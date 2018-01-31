@@ -212,7 +212,8 @@ class Board:
             if player[0] == 'self-player':
                 self.players['player'+str(key)] = Human(key, player[1], units)
             elif player[0] == 'ai-player':
-                self.players['player'+str(key)] = RandomAI(key, player[1], units)
+                if player[2] == 'random':
+                    self.players['player'+str(key)] = RandomAI(key, player[1], units)
         self.starting_units = len(playerslist) * units
         self.log = {}
 
