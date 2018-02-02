@@ -214,6 +214,8 @@ class Board:
             elif player[0] == 'ai-player':
                 if player[2] == 'random':
                     self.players['player'+str(key)] = RandomAI(key, player[1], units)
+                elif player[2] == 'easy':
+                    self.players['player'+str(key)] = EasyAI(key, player[1], units)
         self.starting_units = len(playerslist) * units
         self.log = {}
 

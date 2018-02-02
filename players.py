@@ -130,10 +130,10 @@ class Computer(Player):
         territory.reinforce(1)
         self.decrease_units(1)
         if board.get_round() != 0:
-            if territory.get_name() in self.log['deploy']:
-                self.log['deploy'][territory.get_name()] += 1
+            if territory.get_title() in self.log['deploy']:
+                self.log['deploy'][territory.get_title()] += 1
             else:
-                self.log['deploy'][territory.get_name()] = 1
+                self.log['deploy'][territory.get_title()] = 1
 
     def deploy(self, board):
         while self.units:
@@ -194,5 +194,55 @@ class RandomAI(Computer):
         return territories[ter_id]
 
 
+class EasyAI(Computer):
+    """Class RandomAI - implementation of Computer Player
+    Makes every mov random"""
+    def territory_to_possess(self, board):
+        territories = sorted(
+            [ter for ter in board.get_territories() if ter.get_owner() is None],
+            key=lambda territory: len([ter for ter in territory.get_neighbours()if ter.get_owner() == self]),
+            reverse=True
+        )
+        return territories[0]
+
+    def territory_to_reinforce(self, board):
+        territories = sorted(
+            [ter for ter in self.get_terriitories() if ter.is_border()],
+            key=lambda territory: territory.get_strength() - sum([ter.get_strength() for ter in territory.get_enemies()])
+        )
+        return territories[0]
+
+    def cast_attacks(self, board):
+        territories = [ter for ter in self.get_terriitories() if ter.is_border() and ter.get_strength() > 1]
+        for ter in territories:
+            while ter.is_border() and ter.get_strength() - max([enemy.get_strength() for enemy in ter.get_enemies()]) > 1:
+                enemies = sorted(
+                    ter.get_enemies(),
+                    key=lambda enemy: enemy.get_strength(),
+                    reverse=True
+                )
+                target = enemies[0]
+                if ter.get_strength() - target.get_strength() > 3:
+                    units = target.get_strength() + 3
+                else:
+                    units = ter.get_strength() - 1
+                success = board.attack(ter, target, units)
+                if success and target.get_strength() > 1:
+                    territories.append(target)
+                self.log['attack'].append((ter.get_title(), target.get_title(), units, success))
+
+    def fortify(self, board):
+        if len(self.territory_list) > 1 and len([ter for ter in self.territory_list if ter.get_strength() > 1]) > 0:
+            territory_from = self.random_territory([ter for ter in self.territory_list if ter.get_strength() > 1])
+            group = [ter for ter in territory_from.get_connected() if ter != territory_from]
+            if len(group) > 0:
+                territory_to = self.random_territory(group)
+                units = random.randrange(1, territory_from.get_strength())
+                board.fortify(territory_from, territory_to, units)
+                self.log['fortify'] = (territory_from.get_title(), territory_to.get_title(), units)
+
+    def random_territory(self, territories):
+        ter_id = random.randrange(0, len(territories))
+        return territories[ter_id]
 
 
