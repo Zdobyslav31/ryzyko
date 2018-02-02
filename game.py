@@ -1,6 +1,6 @@
 from flask import render_template
 from players import Human, Computer
-import pickle
+import pickle, collections
 from ryzyko import end_game
 
 
@@ -40,6 +40,9 @@ def game(board):
             phase = board.get_phase()
         elif phase == 'attack':
             active_player.cast_attacks(board)
+            if board.check_elimination():
+                pickle.dump(board, open('board.pkl', 'wb'))
+                return end_game()
             board.new_phase()
             active_player = board.active_player()
             phase = board.get_phase()
@@ -53,7 +56,7 @@ def game(board):
             return 'Error!'
 
     if type(active_player) is Human:
-        log = current_log
+        log = collections.OrderedDict(sorted(current_log.items()))
         current_log = {}
         return render_board(board, log=log)
 
