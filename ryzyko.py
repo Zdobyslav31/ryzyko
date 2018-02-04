@@ -10,7 +10,7 @@ messages = {
     'illegal-too-little': 'Ruch niedozwolony! Masz za mało wojska na tym terytorium, by atakować',
     'illegal-attack-self': 'Ruch niedozwolony! Atakujesz własne terytorium?',
     'illegal-movement': 'Ruch niedozwolony! Aby dotrzeć do tego terytorium, musiałbyś wytrenować spadochroniarzy. Ale nie ma ich w tej grze.',
-    'wrong-phase': 'Zaraz, coś tu nie gra... Czy aby nie pomyliłeś fazy gry?',
+    'wrong-phase': 'Ej, spokojnie, nie klikaj tak szybko bo nie nadążam. Pozwól mi się załadować.',
     'chose-cancelled': 'Wybór prowincji anulowany',
     'attack-success': 'Atak zakończył się powodzeniem',
     'attack-fail': 'Niestety, atak zakończył się porażką',
@@ -278,8 +278,8 @@ def new(map_name, players):
     :return: Board
     """
     # id = random.randrange(0,100)
-    importlib.import_module('static.' + map_name)
-    board = importlib.import_module('.board', package='static.' + map_name)
+    importlib.import_module('static.maps.' + map_name)
+    board = importlib.import_module('.board', package='static.maps.' + map_name)
     board = board.create_map(players, map_name)
     # GAMES_LIST[id] = board
     # session['boardid'] = id

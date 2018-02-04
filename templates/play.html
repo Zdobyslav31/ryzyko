@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <title>Ryzyko</title>
     <link rel=stylesheet type=text/css href="{{ url_for('static', filename='style.css') }}">
-    <link rel=stylesheet type=text/css href="{{ url_for('static', filename=map + '/style.css') }}">
+    <link rel=stylesheet type=text/css href="{{ url_for('static', filename='maps/' + map + '/style.css') }}">
 </head>
 <body>
     {% if message %}
@@ -18,7 +18,7 @@
     </div>
     <div class="board-container">
         <div>
-        <img class="board" src="{{ url_for('static', filename=map+'/mapa.png') }}">
+        <img class="board" src="{{ url_for('static', filename='maps/' + map+'/mapa.png') }}">
         {% for territory in territories %}
             {% if territory[0] in active_territories %}
                 <a href="{{ url_for('play') }}/{{ phase }}/{% if chosen_territory %}{{ chosen_territory }}/{% endif %}{{ territory[0] }}">
