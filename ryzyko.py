@@ -5,7 +5,7 @@ app = Flask(__name__)
 GAMES_LIST = {}
 messages = {
     'illegal-initial': 'Ruch niedozwolony! W tej fazie możesz zajmować tylko niczyje terytoria.',
-    'illegal-deployment': 'Ruch niedozwolony! Miło z Twojej strony,  że chcesz pomóc wrogowi, ale możesz niestety wzmacniać tylko swoje terytoria.',
+    'illegal-deployment': 'Hola hola! Możesz wzmacniać tylko swoje terytoria.',
     'illegal-chose': 'Ruch niedozwolony! Na te ziemie nie sięga Twoja władza. Jeśli chcesz nim zarządzać, to musisz je najpierw podbić.',
     'illegal-too-little': 'Ruch niedozwolony! Masz za mało wojska na tym terytorium, by atakować',
     'illegal-attack-self': 'Ruch niedozwolony! Atakujesz własne terytorium?',
@@ -13,7 +13,8 @@ messages = {
     'wrong-phase': 'Zaraz, coś tu nie gra... Czy aby nie pomyliłeś fazy gry?',
     'chose-cancelled': 'Wybór prowincji anulowany',
     'attack-success': 'Atak zakończył się powodzeniem',
-    'attack-fail': 'Niestety, atak zakończył się porażką'
+    'attack-fail': 'Niestety, atak zakończył się porażką',
+    'not-enough-units': 'Hola hola! Nie masz jednostek na takie zabawy.'
 }
 
 
@@ -58,6 +59,8 @@ def initial(territory=None):
     :return: game -> render_template
     """
     board = pickle.load(open('board.pkl', 'rb'))
+    if board.get_phase() != 'initial':
+        return game.render_board(board, message=messages['wrong-phase'])
     active_player = board.active_player()
     if board.territories[territory].get_owner() is None:
         board.set_owner(territory, active_player, 1)
@@ -77,6 +80,8 @@ def initial_reinforce(territory=None):
     :return: game -> render_template
     """
     board = pickle.load(open('board.pkl', 'rb'))
+    if board.get_phase() != 'initial-reinforce':
+        return game.render_board(board, message=messages['wrong-phase'])
     active_player = board.active_player()
     if board.territories[territory].get_owner() == board.active_player():
         board.territories[territory].reinforce(1)
@@ -96,7 +101,11 @@ def deploy(territory):
     :return: game -> render_template
     """
     board = pickle.load(open('board.pkl', 'rb'))
+    if board.get_phase() != 'deployment':
+        return game.render_board(board, message=messages['wrong-phase'])
     active_player = board.active_player()
+    if active_player.get_units() > 0:
+        return game.render_board(board, message=messages['not-enough-units'])
     if board.territories[territory].get_owner() == board.active_player():
         board.territories[territory].reinforce(1)
         active_player.decrease_units(1)
@@ -116,6 +125,8 @@ def attack_choose(territory):
     :return: game -> render_template
     """
     board = pickle.load(open('board.pkl', 'rb'))
+    if board.get_phase() != 'attack':
+        return game.render_board(board, message=messages['wrong-phase'])
     territory = board.territories[territory]
     if territory.get_owner() != board.active_player():
         return game.render_board(board, message=messages['illegal-chose'])
@@ -133,6 +144,8 @@ def attack_commit(territory_from, territory_to):
     :return: game -> render_template
     """
     board = pickle.load(open('board.pkl', 'rb'))
+    if board.get_phase() != 'attack':
+        return game.render_board(board, message=messages['wrong-phase'])
     territory_from = board.territories[territory_from]
     territory_to = board.territories[territory_to]
     if territory_to == territory_from:
@@ -163,6 +176,8 @@ def fortify_choose(territory):
     :return: game -> render_template
     """
     board = pickle.load(open('board.pkl', 'rb'))
+    if board.get_phase() != 'fortify':
+        return game.render_board(board, message=messages['wrong-phase'])
     territory = board.territories[territory]
     if territory.get_owner() != board.active_player():
         return game.render_board(board, message=messages['illegal-chose'])
@@ -181,6 +196,8 @@ def fortify_commit(territory_from, territory_to):
     :return: game -> render_template
     """
     board = pickle.load(open('board.pkl', 'rb'))
+    if board.get_phase() != 'fortify':
+        return game.render_board(board, message=messages['wrong-phase'])
     territory_from = board.territories[territory_from]
     territory_to = board.territories[territory_to]
     if territory_to == territory_from:
