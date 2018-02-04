@@ -13,6 +13,7 @@
 .options {
 	position: relative;
     left: 1020px;
+    width: 700px;
 }
 
 .question_box {
@@ -26,6 +27,14 @@
 	-webkit-box-shadow: inset 0px 0px 5px 1px rgba(0,0,0,0.41);
 	-moz-box-shadow: inset 0px 0px 5px 1px rgba(0,0,0,0.41);
 	box-shadow: inset 0px 0px 5px 1px rgba(0,0,0,0.41);
+}
+
+.cancel{
+    position: absolute;
+    top: 0px;
+    left: 400px;
+    width: 40px;
+    display: block;
 }
 
 .end_box {

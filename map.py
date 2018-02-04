@@ -286,7 +286,7 @@ class Board:
         Returns full number of the round
         :return: int
         """
-        return (self.turn + 2) // 3
+        return (self.turn + len(self.players) - 1) // len(self.players)
 
     def get_turn(self):
         """
