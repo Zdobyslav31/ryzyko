@@ -104,7 +104,7 @@ def deploy(territory):
     if board.get_phase() != 'deployment':
         return game.render_board(board, message=messages['wrong-phase'])
     active_player = board.active_player()
-    if active_player.get_units() > 0:
+    if active_player.get_units() <= 0:
         return game.render_board(board, message=messages['not-enough-units'])
     if board.territories[territory].get_owner() == board.active_player():
         board.territories[territory].reinforce(1)
