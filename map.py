@@ -192,7 +192,7 @@ class Continent:
 
 class Board:
     """Class Board"""
-    def __init__(self, territorylist, continentlist, playerslist, map_name, unitchart):
+    def __init__(self, board_id, territorylist, continentlist, playerslist, map_name, unitchart):
         """
         Class constructor
         :param territorylist: dict
@@ -201,6 +201,7 @@ class Board:
         :param map_name: string
         :param unitchart: dict
         """
+        self.id = board_id
         self.map_name = map_name
         self.territories = territorylist
         self.continents = continentlist
@@ -218,6 +219,13 @@ class Board:
                     self.players['player'+str(key)] = EasyAI(key, player[1], units)
         self.starting_units = len(playerslist) * units
         self.log = {}
+
+    def get_id(self):
+        """
+        Id getter
+        :return: int
+        """
+        return self.id
 
     def get_map_name(self):
         """

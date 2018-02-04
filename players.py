@@ -142,7 +142,7 @@ class Computer(Player):
     def cast_attacks(self, board):
         territories = [ter for ter in self.get_territories() if ter.is_border() and ter.get_strength() > 1]
         for ter in territories:
-            while ter.is_border() and self.attack_condition(ter):
+            while ter.is_border() and ter.get_strength() > 1 and self.attack_condition(ter):
                 enemies = ter.get_enemies()
                 target = self.select_target(enemies)
                 units = self.attack_units(ter, target)

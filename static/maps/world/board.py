@@ -1,11 +1,12 @@
 from map import *
 
 
-def create_map(players, map_name):
+def create_map(players, map_name, board_id):
     """
     Creates map of type World
     :param players: dict
     :param map_name: string
+    :param board_id: int
     :return: Board
     """
     alaska = Territory('alaska', 'Alaska')
@@ -147,7 +148,7 @@ def create_map(players, map_name):
     africa = Continent('Africa', [northAfr, egypt, eastAfr, congo, madagascar, southAfr], 3)
     australia = Continent('Australia', [indonesia, newGuinea, westAustr, eastAustr], 2)
 
-    board = Board({'alaska': alaska, 'northwestTer': northwestTer, 'greenland': greenland, 'alberta': alberta,
+    board = Board(board_id, {'alaska': alaska, 'northwestTer': northwestTer, 'greenland': greenland, 'alberta': alberta,
                    'ontario': ontario, 'quebec': quebec, 'westUS': westUS, 'eastUS': eastUS, 'centralAmer': centralAmer,
                    'venezuela': venezuela, 'peru': peru, 'brazil': brazil, 'argentina': argentina, 'iceland': iceland,
                    'scandinavia': scandinavia, 'ukraine': ukraine, 'greatBritain': greatBritain, 'northEur': northEur,

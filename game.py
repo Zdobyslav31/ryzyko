@@ -1,7 +1,8 @@
 from flask import render_template
 from players import Human, Computer
-import pickle, collections
-from ryzyko import end_game
+import pickle
+import collections
+from ryzyko import end_game, GAMES_PATH
 
 
 def game(board):
@@ -41,7 +42,7 @@ def game(board):
         elif phase == 'attack':
             active_player.cast_attacks(board)
             if board.check_elimination():
-                pickle.dump(board, open('board.pkl', 'wb'))
+                pickle.dump(board, open(GAMES_PATH + str(board.get_id()) + '/board.pkl', 'wb'))
                 return end_game()
             board.new_phase()
             active_player = board.active_player()
@@ -57,7 +58,6 @@ def game(board):
 
     if type(active_player) is Human:
         log = collections.OrderedDict(sorted(current_log.items()))
-        current_log = {}
         return render_board(board, log=log)
 
 
@@ -69,6 +69,7 @@ def render_board(board, chosen_territory=None, destination_territory=None, messa
     :param chosen_territory: Territory/None
     :param destination_territory: Territory/None
     :param message: string/None
+    :param log: dict/none
     :return: render_template()
     """
     if len(board.alive_players()) <= 1:
@@ -76,7 +77,7 @@ def render_board(board, chosen_territory=None, destination_territory=None, messa
     phase = board.get_phase()
     active_player = board.active_player()
     active_territories = []
-    question_box=[]
+    question_box = []
     if phase == 'initial':
         if active_player.get_units() <= 0:
             board.new_phase()
@@ -106,7 +107,11 @@ def render_board(board, chosen_territory=None, destination_territory=None, messa
                 return game(board)
     if phase == 'fortify':
         if destination_territory:
-            question_box = [chosen_territory.get_title(), destination_territory.get_title(), chosen_territory.get_strength()-1]
+            question_box = [
+                chosen_territory.get_title(),
+                destination_territory.get_title(),
+                chosen_territory.get_strength()-1
+            ]
         if chosen_territory:
             active_territories = [ter.get_name() for ter in list(chosen_territory.get_connected())]
         else:
@@ -116,7 +121,7 @@ def render_board(board, chosen_territory=None, destination_territory=None, messa
                 board.new_phase()
                 return game(board)
 
-    pickle.dump(board, open('board.pkl', 'wb'))
+    pickle.dump(board, open(GAMES_PATH + str(board.get_id()) + '/board.pkl', 'wb'))
     if chosen_territory:
         chosen_territory = chosen_territory.get_name()
     if destination_territory:
