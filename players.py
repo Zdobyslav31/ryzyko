@@ -140,7 +140,17 @@ class Computer(Player):
             self.deploy_once(board)
 
     def cast_attacks(self, board):
-        raise NotImplementedError
+        territories = [ter for ter in self.get_territories() if ter.is_border() and ter.get_strength() > 1]
+        for ter in territories:
+            while ter.is_border() and self.attack_condition(ter):
+                enemies = ter.get_enemies()
+                target = self.select_target(enemies)
+                units = self.attack_units(ter, target)
+                if units > 0 and units < ter.get_strength():
+                    success = board.attack(ter, target, units)
+                    if success and target.get_strength() > 1:
+                        territories.append(target)
+                    self.log['attack'].append((ter.get_title(), target.get_title(), units, success))
 
     def fortify(self, board):
         possible_territories_from = [ter for ter in self.get_territories()
@@ -151,7 +161,7 @@ class Computer(Player):
                 territory_to = self.territory_to_reinforce([ter for ter in territory_from.get_connected()
                                                             if ter is not territory_from])
                 units = self.fortify_units(territory_from, territory_to)
-                if units:
+                if units > 0:
                     board.fortify(territory_from, territory_to, units)
                     self.log['fortify'] = (territory_from.get_title(), territory_to.get_title(), units)
 
@@ -159,6 +169,15 @@ class Computer(Player):
         raise NotImplementedError
 
     def territory_to_reinforce(self, territories):
+        raise NotImplementedError
+    
+    def attack_condition(self, territory):
+        raise NotImplementedError
+        
+    def select_target(self, enemies):
+        raise NotImplementedError
+    
+    def attack_units(self, attacker, target):
         raise NotImplementedError
 
     def territory_from_fortify(self, territories):
@@ -170,28 +189,22 @@ class Computer(Player):
 
 class RandomAI(Computer):
     """Class RandomAI - implementation of Computer Player
-    Makes every mov random"""
+    Makes every move random"""
     def territory_to_possess(self, board):
         territories = [ter for ter in board.get_territories() if ter.get_owner() is None]
         return self.random_territory(territories)
 
     def territory_to_reinforce(self, territories):
         return self.random_territory(territories)
-
-    def cast_attacks(self, board):
-        territories = [ter for ter in self.get_territories() if ter.is_border() and ter.get_strength() > 1]
-        for ter in territories:
-            try:
-                if random.getrandbits(1) and ter.is_border():
-                    target = ter.get_enemies()[random.randrange(0, len(ter.get_enemies()))]
-                    units = random.randrange(1, ter.get_strength())
-                    success = board.attack(ter, target, units)
-                    if success and target.get_strength() > 1:
-                        territories.append(target)
-                    self.log['attack'].append((ter.get_title(), target.get_title(), units, success))
-            except ValueError:
-                print('Error occured while seeking target for %s having %d enemies' % (ter.get_title(), len(ter.get_enemies())))
-                print('Function is_border() returned %s for this element' % str(ter.is_border()))
+    
+    def attack_condition(self, territory):
+        return bool(random.getrandbits(1))
+        
+    def select_target(self, enemies):
+        return self.random_territory(enemies)
+    
+    def attack_units(self, attacker, target):
+        return random.randrange(1, attacker.get_strength())
 
     def territory_from_fortify(self, territories):
         return self.random_territory(territories)
@@ -205,8 +218,8 @@ class RandomAI(Computer):
 
 
 class EasyAI(Computer):
-    """Class RandomAI - implementation of Computer Player
-    Makes every mov random"""
+    """Class EasyAI - implementation of Computer Player
+    Implements easy algorithms for AI"""
     def territory_to_possess(self, board):
         """
         Wybiera terytorium o największej liczbie sojuszniczych sąsiadów
@@ -234,36 +247,21 @@ class EasyAI(Computer):
             reverse=reverse
         )
         return territories[0]
-
-    def cast_attacks(self, board):
-        """
-        Atakuje tak długo, jak długo ma przewagę nad najsilniejszym z wrogich sąsiadów.
-        Wybiera najsłabsze terytorium wroga do atakowania
-        Ilość jednostek do ataku:
-            if jest 1 wrogie terytorium: max
-            elif mamy przewagę większą niż 2: atakujemy z przewagą 2
-            else: max
-        :param board: Board
-        :return: void
-        """
-        territories = [ter for ter in self.get_territories() if ter.is_border() and ter.get_strength() > 1]
-        for ter in territories:
-            while ter.is_border() and ter.get_strength() > max([enemy.get_strength() for enemy in ter.get_enemies()]):
-                enemies = sorted(
-                    ter.get_enemies(),
-                    key=lambda enemy: enemy.get_strength()
-                )
-                target = enemies[0]
-                if len(enemies) == 1:
-                    units = ter.get_strength() - 1
-                elif ter.get_strength() - target.get_strength() > 2:
-                    units = target.get_strength() + 2
-                else:
-                    units = ter.get_strength() - 1
-                success = board.attack(ter, target, units)
-                if success and target.get_strength() > 1:
-                    territories.append(target)
-                self.log['attack'].append((ter.get_title(), target.get_title(), units, success))
+    
+    def attack_condition(self, territory):
+        return bool(territory.get_strength() > max([enemy.get_strength() for enemy in territory.get_enemies()]))
+        
+    def select_target(self, enemies):
+        enemies = sorted(enemies, key=lambda enemy: enemy.get_strength())
+        return enemies[0]
+    
+    def attack_units(self, attacker, target):
+        if len(attacker.get_enemies()) == 1:
+            return attacker.get_strength() - 1
+        elif attacker.get_strength() - target.get_strength() > 2:
+            return target.get_strength() + 2
+        else:
+            return attacker.get_strength() - 1
 
     def territory_from_fortify(self, territories):
         territories_from = sorted(
@@ -280,7 +278,8 @@ class EasyAI(Computer):
         if len(territory_from.get_enemies()) == 0:
             return territory_from.get_strength() - 1
         else:
-            diff_from = territory_from.get_strength() - max([enemy.get_strength() for enemy in territory_from.get_enemies()])
+            diff_from = territory_from.get_strength() - max([enemy.get_strength()
+                                                             for enemy in territory_from.get_enemies()])
             diff_to = territory_to.get_strength() - max([enemy.get_strength() for enemy in territory_to.get_enemies()])
             return (diff_from - diff_to) // 2
 
