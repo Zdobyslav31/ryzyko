@@ -61,7 +61,7 @@ def game(board):
         return render_board(board, log=log)
 
 
-def render_board(board, chosen_territory=None, destination_territory=None, message=None, log=None):
+def render_board(board, chosen_territory=None, destination_territory=None, log=None, abandon=False):
     """
     Board renderer
     Renders board for player according to phase
@@ -131,5 +131,5 @@ def render_board(board, chosen_territory=None, destination_territory=None, messa
                            continents=board.repr_continents(), phase=board.get_phase(), round=board.get_round(),
                            player=[board.active_player().repr_id(), board.active_player().get_name()],
                            active_territories=active_territories, units_left=board.active_player().get_units(),
-                           message=message,  question_box=question_box, log=log,
+                           question_box=question_box, log=log, abandon=abandon,
                            chosen_territory=chosen_territory, destination_territory=destination_territory)

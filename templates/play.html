@@ -1,15 +1,9 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Ryzyko</title>
-    <link rel=stylesheet type=text/css href="{{ url_for('static', filename='style.css') }}">
+{% extends 'layout.html' %}
+{% block title %}Gra{% endblock %}
+{% block head %}
     <link rel=stylesheet type=text/css href="{{ url_for('static', filename='maps/' + map + '/style.css') }}">
-</head>
-<body>
-    {% if message %}
-        {{ message }}<br><br>
-    {% endif %}
+{% endblock %}
+{% block body %}
     <div class="{{ player[0] }}">
         Faza: {{ phase }}, Gracz aktywny: {{ player[1] }}, Runda: {{ round }}<br>
         {% if phase == 'initial' or phase == 'initial-reinforce' or phase == 'deployment' %}
@@ -32,9 +26,18 @@
             <div id="{{ continent[0] }}" class="circle continental {{ continent[1] }}" >{{ continent[2] }}</div>
         {% endfor %}
         </div>
-        {% if question_box %}
+        {% if abandon %}
+        <div class="question_box noplayer">
+            <form action="{{ url_for('abandon_game') }}">
+                <label for="confirm">Czy na pewno chcesz porzucić grę? Nie będzie się dało do niej wrócić.</label>
+                <input type="hidden" name="confirm" value="true">
+                <input type="submit" value="Rzucam wszystko i jadę w Bieszczady!">
+            </form>
+            <a href="{{ url_for('play') }}"><button>Yyy... jednak chcę dokończyć tę partię</button></a>
+        </div>
+        {% elif question_box %}
         <div class="question_box {{ player[0] }}">
-            <a href="{{ url_for('play') }}"><button class="div cancel">X</button></a>
+            <a href="{{ url_for('play') }}"><button class="div cancel">&times;</button></a>
             {% if phase == 'attack' %}
                 Atakujesz {{ question_box[1] }} z {{ question_box[0] }}
             {% else %}
@@ -49,6 +52,7 @@
         </div>
         {% endif %}
         <div class="options">
+            <a href="{{ url_for('abandon_game') }}"><button>Porzuć grę</button></a>
             {% if phase == 'attack' %}
                 <a href="{{ url_for('new_phase') }}"><button>Zakończ ataki</button></a>
             {% elif phase == 'fortify' %}
@@ -73,5 +77,4 @@
             {% endif %}
         </div>
     </div>
-</body>
-</html>
+{% endblock %}

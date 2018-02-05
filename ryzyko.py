@@ -1,12 +1,13 @@
-from flask import Flask, request, render_template, redirect, url_for, make_response, session
+from flask import Flask, request, render_template, redirect, url_for, make_response, flash
 import os
 import pickle
 import importlib
 import game
+import shutil
 
 app = Flask(__name__)
 GAMES_LIST = {}
-messages = {
+MESSAGES = {
     'illegal-initial': 'Ruch niedozwolony! W tej fazie możesz zajmować tylko niczyje terytoria.',
     'illegal-deployment': 'Hola hola! Możesz wzmacniać tylko swoje terytoria.',
     'illegal-chose': 'Ruch niedozwolony! Na te ziemie nie sięga Twoja władza. Jeśli chcesz nim zarządzać, to musisz je najpierw podbić.',
@@ -18,7 +19,9 @@ messages = {
     'attack-success': 'Atak zakończył się powodzeniem',
     'attack-fail': 'Niestety, atak zakończył się porażką',
     'not-enough-units': 'Hola hola! Nie masz jednostek na takie zabawy.',
-    'session-expired': 'Przepraszamy, Twoja sesja wygasła.'
+    'session-expired': 'Przepraszamy, Twoja sesja wygasła.',
+    'game-created': 'Nowa gra utworzona',
+    'game-deleted': 'Dotychczasowa gra została zakończona'
 }
 
 
@@ -47,7 +50,11 @@ def customize():
     Customize game
     :return: render_template
     """
-    return render_template('customize.html')
+    board_id = request.cookies.get('board_id')
+    overwrite = False
+    if board_id and os.path.exists(GAMES_PATH + str(board_id) + '/board.pkl'):
+        overwrite = True
+    return render_template('customize.html', overwrite=overwrite)
 
 
 @app.route('/choose_players')
@@ -73,18 +80,21 @@ def initial(territory=None):
     :return: game -> render_template
     """
     board_id = request.cookies.get('board_id')
-    if board_id:
+    if board_id and os.path.exists(GAMES_PATH + str(board_id) + '/board.pkl'):
         board = pickle.load(open(GAMES_PATH + str(board_id) + '/board.pkl', 'rb'))
     else:
-        return render_template('error.html', message=messages['session-expired'])
+        flash(MESSAGES['session-expired'], 'danger')
+        return render_template('error.html')
     if board.get_phase() != 'initial':
-        return game.render_board(board, message=messages['wrong-phase'])
+        flash(MESSAGES['wrong-phase'], 'danger')
+        return game.render_board(board)
     active_player = board.active_player()
     if board.territories[territory].get_owner() is None:
         board.set_owner(territory, active_player, 1)
         active_player.decrease_units(1)
     else:
-        return game.render_board(board, message=messages['illegal-initial'])
+        flash(MESSAGES['illegal-initial'], 'danger')
+        return game.render_board(board)
     board.new_phase()
     pickle.dump(board, open(GAMES_PATH + str(board_id) + '/board.pkl', 'wb'))
     return game.game(board)
@@ -98,18 +108,21 @@ def initial_reinforce(territory=None):
     :return: game -> render_template
     """
     board_id = request.cookies.get('board_id')
-    if board_id:
+    if board_id and os.path.exists(GAMES_PATH + str(board_id) + '/board.pkl'):
         board = pickle.load(open(GAMES_PATH + str(board_id) + '/board.pkl', 'rb'))
     else:
-        return render_template('error.html', message=messages['session-expired'])
+        flash(MESSAGES['session-expired'], 'danger')
+        return render_template('error.html')
     if board.get_phase() != 'initial-reinforce':
-        return game.render_board(board, message=messages['wrong-phase'])
+        flash(MESSAGES['wrong-phase'], 'danger')
+        return game.render_board(board)
     active_player = board.active_player()
     if board.territories[territory].get_owner() == board.active_player():
         board.territories[territory].reinforce(1)
         active_player.decrease_units(1)
     else:
-        return game.render_board(board, message=messages['illegal-deployment'])
+        flash(MESSAGES['illegal-deployment'], 'danger')
+        return game.render_board(board)
     board.new_phase()
     pickle.dump(board, open(GAMES_PATH + str(board_id) + '/board.pkl', 'wb'))
     return game.game(board)
@@ -123,20 +136,24 @@ def deploy(territory):
     :return: game -> render_template
     """
     board_id = request.cookies.get('board_id')
-    if board_id:
+    if board_id and os.path.exists(GAMES_PATH + str(board_id) + '/board.pkl'):
         board = pickle.load(open(GAMES_PATH + str(board_id) + '/board.pkl', 'rb'))
     else:
-        return render_template('error.html', message=messages['session-expired'])
+        flash(MESSAGES['session-expired'], 'danger')
+        return render_template('error.html')
     if board.get_phase() != 'deployment':
-        return game.render_board(board, message=messages['wrong-phase'])
+        flash(MESSAGES['wrong-phase'], 'danger')
+        return game.render_board(board)
     active_player = board.active_player()
     if active_player.get_units() <= 0:
-        return game.render_board(board, message=messages['not-enough-units'])
+        flash(MESSAGES['not-enough-units'], 'danger')
+        return game.render_board(board)
     if board.territories[territory].get_owner() == board.active_player():
         board.territories[territory].reinforce(1)
         active_player.decrease_units(1)
     else:
-        return game.render_board(board, message=messages['illegal-deployment'])
+        flash(MESSAGES['illegal-deployment'], 'danger')
+        return game.render_board(board)
     if active_player.get_units() <= 0:
         board.new_phase()
     pickle.dump(board, open(GAMES_PATH + str(board_id) + '/board.pkl', 'wb'))
@@ -151,17 +168,21 @@ def attack_choose(territory):
     :return: game -> render_template
     """
     board_id = request.cookies.get('board_id')
-    if board_id:
+    if board_id and os.path.exists(GAMES_PATH + str(board_id) + '/board.pkl'):
         board = pickle.load(open(GAMES_PATH + str(board_id) + '/board.pkl', 'rb'))
     else:
-        return render_template('error.html', message=messages['session-expired'])
+        flash(MESSAGES['session-expired'], 'danger')
+        return render_template('error.html')
     if board.get_phase() != 'attack':
-        return game.render_board(board, message=messages['wrong-phase'])
+        flash(MESSAGES['wrong-phase'], 'danger')
+        return game.render_board(board)
     territory = board.territories[territory]
     if territory.get_owner() != board.active_player():
-        return game.render_board(board, message=messages['illegal-chose'])
+        flash(MESSAGES['illegal-chose'], 'danger')
+        return game.render_board(board)
     if territory.get_strength() == 1:
-        return game.render_board(board, message=messages['illegal-too-little'])
+        flash(MESSAGES['illegal-too-little'], 'danger')
+        return game.render_board(board)
     return game.render_board(board, chosen_territory=territory)
 
 
@@ -174,29 +195,32 @@ def attack_commit(territory_from, territory_to):
     :return: game -> render_template
     """
     board_id = request.cookies.get('board_id')
-    if board_id:
+    if board_id and os.path.exists(GAMES_PATH + str(board_id) + '/board.pkl'):
         board = pickle.load(open(GAMES_PATH + str(board_id) + '/board.pkl', 'rb'))
     else:
-        return render_template('error.html', message=messages['session-expired'])
+        flash(MESSAGES['session-expired'], 'danger')
+        return render_template('error.html')
     if board.get_phase() != 'attack':
-        return game.render_board(board, message=messages['wrong-phase'])
+        flash(MESSAGES['wrong-phase'], 'danger')
+        return game.render_board(board)
     territory_from = board.territories[territory_from]
     territory_to = board.territories[territory_to]
     if territory_to == territory_from:
-        return game.render_board(board, message=messages['chose-cancelled'])
+        flash(MESSAGES['chose-cancelled'], 'info')
+        return game.render_board(board)
 
     if request.args.get('units'):
         units = int(request.args.get('units'))
         # do zrobienia: sprawdzenie poprawności
         if board.attack(territory_from, territory_to, units):
-            message = messages['attack-success']
+            flash(MESSAGES['attack-success'], 'danger')
         else:
-            message = messages['attack-fail']
+            flash(MESSAGES['attack-fail'], 'danger')
         if board.check_elimination():
             pickle.dump(board, open(GAMES_PATH + str(board_id) + '/board.pkl', 'wb'))
             return end_game()
         pickle.dump(board, open(GAMES_PATH + str(board_id) + '/board.pkl', 'wb'))
-        return game.render_board(board, message=message)
+        return game.render_board(board)
     else:
         # do zrobienia: sprawdzenie poprawności
         return game.render_board(board, chosen_territory=territory_from, destination_territory=territory_to)
@@ -210,17 +234,21 @@ def fortify_choose(territory):
     :return: game -> render_template
     """
     board_id = request.cookies.get('board_id')
-    if board_id:
+    if board_id and os.path.exists(GAMES_PATH + str(board_id) + '/board.pkl'):
         board = pickle.load(open(GAMES_PATH + str(board_id) + '/board.pkl', 'rb'))
     else:
-        return render_template('error.html', message=messages['session-expired'])
+        flash(MESSAGES['session-expired'], 'danger')
+        return render_template('error.html')
     if board.get_phase() != 'fortify':
-        return game.render_board(board, message=messages['wrong-phase'])
+        flash(MESSAGES['wrong-phase'], 'danger')
+        return game.render_board(board)
     territory = board.territories[territory]
     if territory.get_owner() != board.active_player():
-        return game.render_board(board, message=messages['illegal-chose'])
+        flash(MESSAGES['illegal-chose'], 'danger')
+        return game.render_board(board)
     if territory.get_strength() == 1:
-        return game.render_board(board, message=messages['illegal-too-little'])
+        flash(MESSAGES['illegal-too-little'], 'danger')
+        return game.render_board(board)
     pickle.dump(board, open(GAMES_PATH + str(board_id) + '/board.pkl', 'wb'))
     return game.render_board(board, chosen_territory=territory)
 
@@ -234,16 +262,19 @@ def fortify_commit(territory_from, territory_to):
     :return: game -> render_template
     """
     board_id = request.cookies.get('board_id')
-    if board_id:
+    if board_id and os.path.exists(GAMES_PATH + str(board_id) + '/board.pkl'):
         board = pickle.load(open(GAMES_PATH + str(board_id) + '/board.pkl', 'rb'))
     else:
-        return render_template('error.html', message=messages['session-expired'])
+        flash(MESSAGES['session-expired'], 'danger')
+        return render_template('error.html')
     if board.get_phase() != 'fortify':
-        return game.render_board(board, message=messages['wrong-phase'])
+        flash(MESSAGES['wrong-phase'], 'danger')
+        return game.render_board(board)
     territory_from = board.territories[territory_from]
     territory_to = board.territories[territory_to]
     if territory_to == territory_from:
-        return game.render_board(board, message=messages['chose-cancelled'])
+        flash(MESSAGES['chose-cancelled'], 'info')
+        return game.render_board(board)
 
     if request.args.get('units'):
         units = int(request.args.get('units'))
@@ -284,10 +315,11 @@ def new_phase():
     :return: game -> render_template
     """
     board_id = request.cookies.get('board_id')
-    if board_id:
+    if board_id and os.path.exists(GAMES_PATH + str(board_id) + '/board.pkl'):
         board = pickle.load(open(GAMES_PATH + str(board_id) + '/board.pkl', 'rb'))
     else:
-        return render_template('error.html', message=messages['session-expired'])
+        flash(MESSAGES['session-expired'], 'danger')
+        return render_template('error.html')
     board.new_phase()
     pickle.dump(board, open(GAMES_PATH + str(board_id) + '/board.pkl', 'wb'))
     return game.game(board)
@@ -301,10 +333,11 @@ def play():
     :return: game -> render_template
     """
     board_id = request.cookies.get('board_id')
-    if board_id:
+    if board_id and os.path.exists(GAMES_PATH + str(board_id) + '/board.pkl'):
         board = pickle.load(open(GAMES_PATH + str(board_id) + '/board.pkl', 'rb'))
     else:
-        return render_template('error.html', message=messages['session-expired'])
+        flash(MESSAGES['session-expired'], 'danger')
+        return render_template('error.html')
     return game.game(board)
 
 
@@ -315,14 +348,37 @@ def end_game():
     :return: game -> render_template
     """
     board_id = request.cookies.get('board_id')
-    if board_id:
+    if board_id and os.path.exists(GAMES_PATH + str(board_id) + '/board.pkl'):
         board = pickle.load(open(GAMES_PATH + str(board_id) + '/board.pkl', 'rb'))
     else:
-        return render_template('error.html', message=messages['session-expired'])
+        flash(MESSAGES['session-expired'], 'danger')
+        return render_template('error.html')
     winner = board.alive_players()[0]
+    shutil.rmtree(GAMES_PATH + str(board_id))
+    flash(MESSAGES['game-deleted'], 'success')
     return render_template('end_game.html', map=board.get_map_name(), territories=board.repr_territories(),
                            continents=board.repr_continents(),
                            round=board.get_round(), player=[winner.repr_id(), winner.get_name()])
+
+
+@app.route('/abandon_game', methods=['GET'])
+def abandon_game():
+    """
+    Abandon game
+    :return: redirect -> hello()
+    """
+    board_id = request.cookies.get('board_id')
+    if board_id and os.path.exists(GAMES_PATH + str(board_id) + '/board.pkl'):
+        board = pickle.load(open(GAMES_PATH + str(board_id) + '/board.pkl', 'rb'))
+    else:
+        flash(MESSAGES['session-expired'], 'danger')
+        return render_template('error.html')
+    if request.args.get('confirm'):
+        shutil.rmtree(GAMES_PATH + str(board_id))
+        flash(MESSAGES['game-deleted'], 'success')
+        return redirect(url_for('hello'))
+    else:
+        return game.render_board(board, abandon=True)
 
 
 """Funkcje pomocnicze"""
@@ -335,11 +391,16 @@ def new(map_name, players):
     :param players: dict
     :return: Board
     """
+    board_id = request.cookies.get('board_id')
+    if board_id and os.path.exists(GAMES_PATH + str(board_id) + '/board.pkl'):
+        shutil.rmtree(GAMES_PATH + str(board_id))
+        flash(MESSAGES['game-deleted'], 'success')
     board_id = next(ID_GENERATOR)
     importlib.import_module('static.maps.' + map_name)
     board = importlib.import_module('.board', package='static.maps.' + map_name)
     board = board.create_map(players, map_name, board_id)
     os.mkdir(GAMES_PATH + str(board_id))
+    flash(MESSAGES['game-created'], 'success')
     pickle.dump(board, open(GAMES_PATH + str(board_id) + '/board.pkl', 'wb'))
     return board
 

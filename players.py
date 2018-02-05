@@ -259,7 +259,7 @@ class EasyAI(Computer):
         if len(attacker.get_enemies()) == 1:
             return attacker.get_strength() - 1
         elif attacker.get_strength() - target.get_strength() > 2:
-            return target.get_strength() + 2
+            return max(target.get_strength() + 2, (attacker.get_strength() - target.get_strength()) // 2)
         else:
             return attacker.get_strength() - 1
 

@@ -1,12 +1,9 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Ryzyko</title>
-    <link rel=stylesheet type=text/css href="{{ url_for('static', filename='style.css') }}">
-    <link rel=stylesheet type=text/css href="{{ url_for('static', filename=map + '/style.css') }}">
-</head>
-<body>
+{% extends 'layout.html' %}
+{% block title %}Koniec gry{% endblock %}
+{% block head %}
+    <link rel=stylesheet type=text/css href="{{ url_for('static', filename='maps/' + map + '/style.css') }}">
+{% endblock %}
+{% block body %}
     <div class="board-container">
         <div>
         <img class="board" src="{{ url_for('static', filename=map+'/mapa.png') }}">
@@ -24,5 +21,4 @@
             <a href="{{ url_for('hello') }}"><button>Zagraj jeszcze raz</button></a>
         </div>
     </div>
-</body>
-</html>
+{% endblock %}

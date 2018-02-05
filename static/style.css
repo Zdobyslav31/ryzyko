@@ -29,6 +29,30 @@
 	box-shadow: inset 0px 0px 5px 1px rgba(0,0,0,0.41);
 }
 
+.alert {
+	padding: 5px;
+}
+
+.alert-danger {
+	background-color: rgb(210, 64, 50);
+	border: 2px solid rgb(119, 2, 0);
+}
+
+.alert-info {
+	background-color: rgb(69, 153, 210);
+	border: 2px solid rgb(21, 24, 105);
+}
+
+.alert-success {
+	background-color: rgb(143, 238, 149);
+	border: 2px solid rgb(0, 103, 11);
+}
+
+.alert-warning {
+	background-color: rgb(210, 206, 114);
+	border: 2px solid rgb(171, 145, 17);
+}
+
 .cancel{
     position: absolute;
     top: 0px;

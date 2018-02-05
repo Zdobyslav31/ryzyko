@@ -1,12 +1,8 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Ryzyko - tworzenie nowej gry</title>
-    <script src="http://code.jquery.com/jquery-1.9.1.js"></script>
-</head>
-<body>
-    Wybierz graczy
+{% extends 'layout.html' %}
+{% block title %}Tworzenie nowej gry{% endblock %}
+{% block head %}{% endblock %}
+{% block body %}
+    <h1>Wybierz graczy</h1>
     <form method="GET" action="{{ url_for('newgame')}}">
         <label for="player1">Gracz 1</label>
         <select name="player1">
@@ -45,5 +41,4 @@
                 document.getElementById(id).style.display = "none";
         }
     </script>
-</body>
-</html>
+{% endblock %}

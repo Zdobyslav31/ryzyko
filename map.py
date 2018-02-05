@@ -405,19 +405,24 @@ class Board:
         while attacking_units and defending_units:
             attacker_dices = []
             for i in range(attacking_units):
-                attacker_dices.append(random.randrange(1, 6))
+                attacker_dices.append(random.randrange(1, 7))
+            attacker_dices = sorted(attacker_dices, reverse=True)
             defender_dices = []
             for i in range(defending_units):
-                defender_dices.append(random.randrange(1, 6))
+                defender_dices.append(random.randrange(1, 7))
+            defender_dices = sorted(defender_dices, reverse=True)
+            print('attacker: ', attacker_dices, '; defender: ', defender_dices)
             for i in range(min(len(attacker_dices), len(defender_dices))):
                 if attacker_dices[i] > defender_dices[i]:
                     defending_units -= 1
                 else:
                     attacking_units -= 1
         if attacking_units:
+            print('attacker wins')
             self.set_owner(ter_defence.get_name(), ter_attack.get_owner(), attacking_units)
             return True
         else:
+            print('defender wins')
             ter_defence.set_strength(defending_units)
             return False
 

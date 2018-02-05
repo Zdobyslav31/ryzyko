@@ -1,12 +1,13 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Ryzyko - tworzenie nowej gry</title>
-</head>
-<body>
+{% extends 'layout.html' %}
+{% block title %}Wybór graczy{% endblock %}
+{% block head %}{% endblock %}
+{% block body %}
+    {% if overwrite %}
+        Uwaga! Masz niedokończoną grę. Stworzenie nowej spowoduje usunięcie starej. Może jednak chcesz dokończyć partię?
+        <a href="{{ url_for('play') }}"><button>Rzeczywiście, chcę</button></a><br>
+    {% endif %}
     <form method="GET" action="{{ url_for('choose_players')}}">
-
+        <h1>Dostosuj grę</h1>
         <label for="players">Wybierz ilość graczy</label><br>
         <input type="radio" name="players" value="2" required>2<br>
         <input type="radio" name="players" value="3" required>3<br>
@@ -21,5 +22,4 @@
         <input type="hidden" name="newgame" value="True">
         <input type="submit" value="Dalej">
     </form>
-</body>
-</html>
+{% endblock %}

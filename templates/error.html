@@ -1,13 +1,4 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Błąd</title>
-</head>
-<body>
-    {% if message %}
-        {{ message }}
-    {% endif %}
-    <a href="{{ url_for('hello') }}"><button>Zagraj ponownie</button></a>
-</body>
-</html>
+{% extends 'layout.html' %}
+{% block title %}Błąd!{% endblock %}
+{% block head %}{% endblock %}
+{% block body %}{% endblock %}
