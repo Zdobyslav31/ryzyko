@@ -166,12 +166,15 @@ class Computer(Player):
         if len(possible_territories_from) > 0:
             territory_from = self.territory_from_fortify(possible_territories_from)
             if territory_from:
-                territory_to = self.territory_to_reinforce([ter for ter in territory_from.get_connected()
-                                                            if ter is not territory_from])
-                units = self.fortify_units(territory_from, territory_to)
-                if units > 0:
-                    board.fortify(territory_from, territory_to, units)
-                    self.log['fortify'] = (territory_from.get_title(), territory_to.get_title(), units)
+                try:
+                    territory_to = self.territory_to_reinforce([ter for ter in territory_from.get_connected()
+                                                                if ter is not territory_from])
+                    units = self.fortify_units(territory_from, territory_to)
+                    if units > 0:
+                        board.fortify(territory_from, territory_to, units)
+                        self.log['fortify'] = (territory_from.get_title(), territory_to.get_title(), units)
+                except IndexError:
+                    print('error while trying to fortify from %s in group consisted of %s' % (territory_from, [ter for ter in territory_from.get_connected() if ter is not territory_from]))
 
     def territory_to_possess(self, board):
         raise NotImplementedError
@@ -289,4 +292,3 @@ class EasyAI(Computer):
                                                              for enemy in territory_from.get_enemies()])
             diff_to = territory_to.get_strength() - max([enemy.get_strength() for enemy in territory_to.get_enemies()])
             return (diff_from - diff_to) // 2
-

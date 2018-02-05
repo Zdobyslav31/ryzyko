@@ -394,13 +394,13 @@ class Board:
         :return: int
         """
         player = self.active_player()
-        reinforcments = len(self.player_territories(player)) // 3
-        if reinforcments < 3:
-            reinforcments = 3
+        reinforcements = len(self.player_territories(player)) // 3
+        if reinforcements < 3:
+            reinforcements = 3
         for key, con in self.continents.items():
             if con.get_owner() == player:
-                reinforcments += con.get_units()
-        return reinforcments
+                reinforcements += con.get_units()
+        return reinforcements
 
     def attack(self, ter_attack, ter_defence, units):
         """

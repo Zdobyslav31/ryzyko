@@ -1,4 +1,6 @@
 {% extends 'layout.html' %}
 {% block title %}Błąd!{% endblock %}
 {% block head %}{% endblock %}
-{% block body %}{% endblock %}
+{% block body %}
+    <a href="{{ url_for('hello') }}"><button>Zagraj jeszcze raz</button></a>
+{% endblock %}

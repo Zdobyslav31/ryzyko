@@ -55,24 +55,25 @@
         </div>
         {% endif %}
         <div class="options">
-            <a href="{{ url_for('abandon_game') }}"><button>Porzuć grę</button></a>
+            <a href="{{ url_for('abandon_game') }}"><button style="color: #ad3e3c">Porzuć grę</button></a>
             {% if phase == 'attack' %}
-                <a href="{{ url_for('new_phase') }}"><button>Zakończ ataki</button></a>
+                <br><a href="{{ url_for('new_phase') }}"><button><strong>Zakończ ataki</strong></button></a>
             {% elif phase == 'fortify' %}
-                <a href="{{ url_for('new_phase') }}"><button>Zakończ rundę bez przenoszenia wojsk</button></a>
+                <br><a href="{{ url_for('new_phase') }}"><button><strong>Zakończ rundę bez przenoszenia wojsk</strong></button></a>
             {% endif %}
             {% if log %}
+                <h1>Ruchy pozostałych graczy</h1>
                 {% for turn, actions in log.items() %}
-                    <h1 class="player{{ actions['player'][1] }}">Ruchy gracza {{ actions['player'][0] }}</h1>
-                        <h2>Wzmocnienia</h2>
+                    <h2 class="player{{ actions['player'][1] }}">Ruchy gracza {{ actions['player'][0] }}</h2>
+                        <h3>Wzmocnienia</h3>
                         {% for ter, dep in actions['deploy'].items() %}
                             {{ dep }} jednostek na terytorium {{ ter }}<br>
                         {% endfor %}
-                        <h2>Ataki</h2>
+                        <h3>Ataki</h3>
                         {% for attack in actions['attack'] %}
                             Atak {{ attack[2] }} jednostkami z {{ attack[0] }} na {{ attack[1] }} - {% if attack[3] %}sukces{% else %}porażka{% endif %}<br>
                         {% endfor %}
-                        <h2>Przegrupowania</h2>
+                        <h3>Przegrupowania</h3>
                         {% if actions['fortify'] %}
                             {{ actions['fortify'][2] }} jednostek z {{ actions['fortify'][0] }} do {{ actions['fortify'][1] }}
                         {% endif %}
