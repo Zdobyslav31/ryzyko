@@ -1,3 +1,11 @@
+body {
+    margin: 0;
+}
+
+.content {
+    margin: 8px;
+}
+
 .board {
 	width: 1000px;
 	position: absolute;
@@ -28,6 +36,32 @@
 	-webkit-box-shadow: inset 0px 0px 5px 1px rgba(0,0,0,0.41);
 	-moz-box-shadow: inset 0px 0px 5px 1px rgba(0,0,0,0.41);
 	box-shadow: inset 0px 0px 5px 1px rgba(0,0,0,0.41);
+}
+
+.player {
+	margin: 5px;
+	padding: 10px 15px;
+	width: 500px;
+    border-radius: 15px;
+	-webkit-box-shadow: inset 0px 0px 5px 1px rgba(0,0,0,0.41);
+	-moz-box-shadow: inset 0px 0px 5px 1px rgba(0,0,0,0.41);
+	box-shadow: inset 0px 0px 5px 1px rgba(0,0,0,0.41);
+}
+
+.title {
+    display: block;
+    padding: 5px 15px;
+    text-decoration: none;
+    color: darkred;
+    background-color: #ee825d;
+	-webkit-box-shadow: inset 0px 0px 15px 1px rgba(0,0,0,0.41);
+	-moz-box-shadow: inset 0px 0px 15px 1px rgba(0,0,0,0.41);
+	box-shadow: inset 0px 0px 15px 1px rgba(0,0,0,0.41);
+}
+
+.inactive {
+    color: white;
+    text-align: center;
 }
 
 .alert {

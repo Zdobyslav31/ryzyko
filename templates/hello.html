@@ -3,4 +3,6 @@
 {% block head %}{% endblock %}
 {% block body %}
 <a href="{{ url_for('customize') }}" ><button>Stwórz nową grę!</button></a>
+<a href="{{ url_for('select_game') }}" ><button>Wybierz spośród rozpoczętych gier</button></a>
+<a href="{{ url_for('join_game') }}" ><button>Dołącz do gry online</button></a>
 {% endblock %}

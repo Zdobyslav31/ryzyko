@@ -1,0 +1,23 @@
+{% extends 'layout.html' %}
+{% block title %}{{ game['game_name'] }} - poczekalnia{% endblock %}
+{% block head %}{% endblock %}
+{% block body %}
+    <h1>Poczekalnia</h1>
+    {% for player in game['players'] %}
+        <div class="player player{{ player[0] }}{% if not player[1] %} inactive{% endif %}">
+            <h2>Gracz {{ player[0] }}</h2>
+            {% if player[1] %}
+                {{ player[2] }}
+                {% if player[1] == 'ai' %}
+                     - gracz komputerowy
+                {% else %}
+                     - gracz ludzki
+                {% endif %}
+            {% else %}
+                <em>Oczekuję...</em>
+            {% endif %}
+        </div>
+    {% endfor %}
+    <a href="{{ url_for('play') }}"><button>Sprawdź, czy już ktoś się dosiadł</button></a>
+    <a href="{{ url_for('abandon_game') }}"><button style="color: #ad3e3c">Porzuć grę</button></a>
+{% endblock %}

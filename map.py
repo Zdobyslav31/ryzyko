@@ -261,6 +261,33 @@ class Board:
         """
         return [ter for key, ter in self.territories.items()]
 
+    def get_players(self):
+        """
+        Players getter
+        :return: list
+        """
+        return [player for key, player in self.players.items()]
+
+    def get_player_instances(self, player_id):
+        """
+        Get player by id
+        :param player_id: int
+        :return: list
+        """
+        return [player for key, player in self.players.items() if player.get_player_id() == player_id]
+
+    def set_player(self, seat, player_id, name):
+        """
+        Set human player
+        :param seat: int
+        :param player_id: int
+        :param name: string
+        :return:
+        """
+        player = self.players['player' + str(seat)]
+        player.set_name(name)
+        player.set_player_id(player_id)
+
     def get_territory(self, name):
         """
         Get territory of given full-id

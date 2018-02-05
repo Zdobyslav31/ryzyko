@@ -10,6 +10,10 @@
             Units left: {{ units_left }}
         {% endif %}
     </div>
+    {% if watching %}
+        Trwa ruch innego gracza. Poczekaj na swoją kolej
+        <a href="{{ url_for('play') }}"><button>Odśwież, by sprawdzić, czy to już</button></a>
+    {% endif %}
     <div class="board-container">
         <div>
         <img class="board" src="{{ url_for('static', filename='maps/' + map+'/mapa.png') }}">
@@ -57,9 +61,9 @@
         <div class="options">
             <a href="{{ url_for('abandon_game') }}"><button style="color: #ad3e3c">Porzuć grę</button></a>
             {% if phase == 'attack' %}
-                <br><a href="{{ url_for('new_phase') }}"><button><strong>Zakończ ataki</strong></button></a>
+                <br><a href="{{ url_for('play') + '/new_phase' }}"><button><strong>Zakończ ataki</strong></button></a>
             {% elif phase == 'fortify' %}
-                <br><a href="{{ url_for('new_phase') }}"><button><strong>Zakończ rundę bez przenoszenia wojsk</strong></button></a>
+                <br><a href="{{ url_for('play') + '/new_phase' }}"><button><strong>Zakończ rundę bez przenoszenia wojsk</strong></button></a>
             {% endif %}
             {% if log %}
                 <h1>Ruchy pozostałych graczy</h1>

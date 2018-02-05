@@ -40,6 +40,9 @@ class Player:
         """
         return self.id_on_board
 
+    def get_player_id(self):
+        raise NotImplementedError
+
     def repr_id(self):
         """
         Writes out full-id_on_board of the player
@@ -121,6 +124,12 @@ class Human(Player):
     def get_player_id(self):
         return self.player_id
 
+    def set_name(self, name):
+        self.name = name
+
+    def set_player_id(self, player_id):
+        self.player_id = player_id
+
 
 class Computer(Player):
     """Computer Player interface"""
@@ -132,6 +141,9 @@ class Computer(Player):
         """
         territory = self.territory_to_possess([ter for ter in board.get_territories() if ter.get_owner() is None])
         board.set_owner(territory.get_name(), self, 1)
+
+    def get_player_id(self):
+        return 'ai'
 
     def deploy_once(self, board):
         territory = self.territory_to_reinforce(self.get_territories())

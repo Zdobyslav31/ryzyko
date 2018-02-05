@@ -15,19 +15,21 @@
             <label for="player{{ i }}">Gracz {{ i }}</label>
             <select name="player{{ i }}" onchange="toggleInputs(this, 'player{{ i }}algorithm', 'player{{ i }}name')">
                 <option value="ai-player">Gracz komputerowy</option>
-                <option value="self-player">Gracz ludzki (z tego okna)</option>
+                <option value="self-player">Ja (z tego okna)</option>
                 <option value="human-player">Inny gracz online</option>
             </select>
-        <label for="player{{ i }}name">Imię gracza:</label>
-        <input type="text" name="player{{ i }}name">
-        <div  id="player{{ i }}algorithm" style="display: inline">
-            <label for="player{{ i }}algorithm">Algorytm</label>
-            <select name="player{{ i }}algorithm">
-                <option value="easy">EasyAI</option>
-                <option value="random">RandomAI</option>
-            </select>
-        </div>
-        <br>
+            <div id="player{{ i }}name" style="display: inline">
+                <label for="player{{ i }}name">Imię gracza:</label>
+                <input type="text" name="player{{ i }}name">
+            </div>
+            <div  id="player{{ i }}algorithm" style="display: inline">
+                <label for="player{{ i }}algorithm">Algorytm</label>
+                <select name="player{{ i }}algorithm">
+                    <option value="easy">EasyAI</option>
+                    <option value="random">RandomAI</option>
+                </select>
+            </div>
+            <br>
         {% endfor %}
         <input type="hidden" name="players_num" value="{{ players_num }}">
         <input type="hidden" name="map_name" value="{{ map_name }}">
