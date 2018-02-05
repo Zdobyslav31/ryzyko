@@ -1,5 +1,5 @@
 {% extends 'layout.html' %}
-{% block title %}Tworzenie nowej gry{% endblock %}
+{% block title %}{{ game_name }} - wybór graczy{% endblock %}
 {% block head %}{% endblock %}
 {% block body %}
     <h1>Wybierz graczy</h1>
@@ -13,10 +13,10 @@
         <br>
         {% for i in range(2, players_num + 1) %}
             <label for="player{{ i }}">Gracz {{ i }}</label>
-            <select name="player{{ i }}" onchange="toggleAlgorithmChoose(this, 'player{{ i }}algorithm')">
+            <select name="player{{ i }}" onchange="toggleInputs(this, 'player{{ i }}algorithm', 'player{{ i }}name')">
                 <option value="ai-player">Gracz komputerowy</option>
                 <option value="self-player">Gracz ludzki (z tego okna)</option>
-                <option value="human-player" disabled>Inny gracz online</option>
+                <option value="human-player">Inny gracz online</option>
             </select>
         <label for="player{{ i }}name">Imię gracza:</label>
         <input type="text" name="player{{ i }}name">
@@ -31,14 +31,23 @@
         {% endfor %}
         <input type="hidden" name="players_num" value="{{ players_num }}">
         <input type="hidden" name="map_name" value="{{ map_name }}">
+        <input type="hidden" name="game_name" value="{{ game_name }}">
         <input type="submit" value="Graj!">
     </form>
     <script>
-        function toggleAlgorithmChoose(elem, id) {
-            if(elem.value === "ai-player")
-                document.getElementById(id).style.display = "inline";
-            else
-                document.getElementById(id).style.display = "none";
+        function toggleInputs(elem, algorithm, name) {
+            if(elem.value === "ai-player") {
+                document.getElementById(algorithm).style.display = "inline";
+                document.getElementById(name).style.display = "inline";
+            }
+            else if(elem.value === "human-player") {
+                document.getElementById(algorithm).style.display = "none";
+                document.getElementById(name).style.display = "none";
+            }
+            else {
+                document.getElementById(algorithm).style.display = "none";
+                document.getElementById(name).style.display = "inline";
+            }
         }
     </script>
 {% endblock %}

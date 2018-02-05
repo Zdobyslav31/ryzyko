@@ -1,7 +1,7 @@
 from map import *
 
 
-def create_map(players, map_name, board_id):
+def create_map(players, map_name, game_name, board_id):
     """
     Creates map of type MiddleEarth
     :param players: dict
@@ -50,9 +50,9 @@ def create_map(players, map_name, board_id):
     arnor = Continent('Arnor', [lindon, eriador, enedwaith], 2)
     shadowlands = Continent('Shadowlands', [mordor, rhun, khand], 1)
 
-    board = Board(board_id, {'lindon': lindon, 'eriador': eriador, 'forodwaith': forodwaith, 'enedwaith': enedwaith,
-                   'moria': moria, 'rhovanion': rhovanion, 'rohan': rohan, 'gondor': gondor, 'rhun': rhun,
-                   'mordor': mordor, 'khand': khand, 'harad': harad},
+    board = Board(board_id, game_name, {'lindon': lindon, 'eriador': eriador, 'forodwaith': forodwaith,
+                   'enedwaith': enedwaith, 'moria': moria, 'rhovanion': rhovanion, 'rohan': rohan, 'gondor': gondor,
+                   'rhun': rhun, 'mordor': mordor, 'khand': khand, 'harad': harad},
                   {'arnor': arnor, 'shadowlands': shadowlands},
                   players, map_name, unitchart)
 

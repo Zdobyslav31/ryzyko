@@ -1,5 +1,5 @@
 {% extends 'layout.html' %}
-{% block title %}Gra{% endblock %}
+{% block title %}{{ game_name }}{% endblock %}
 {% block head %}
     <link rel=stylesheet type=text/css href="{{ url_for('static', filename='maps/' + map + '/style.css') }}">
 {% endblock %}

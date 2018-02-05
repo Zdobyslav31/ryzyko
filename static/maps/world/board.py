@@ -1,7 +1,7 @@
 from map import *
 
 
-def create_map(players, map_name, board_id):
+def create_map(players, map_name, game_name, board_id):
     """
     Creates map of type World
     :param players: dict
@@ -148,17 +148,17 @@ def create_map(players, map_name, board_id):
     africa = Continent('Africa', [northAfr, egypt, eastAfr, congo, madagascar, southAfr], 3)
     australia = Continent('Australia', [indonesia, newGuinea, westAustr, eastAustr], 2)
 
-    board = Board(board_id, {'alaska': alaska, 'northwestTer': northwestTer, 'greenland': greenland, 'alberta': alberta,
-                   'ontario': ontario, 'quebec': quebec, 'westUS': westUS, 'eastUS': eastUS, 'centralAmer': centralAmer,
-                   'venezuela': venezuela, 'peru': peru, 'brazil': brazil, 'argentina': argentina, 'iceland': iceland,
-                   'scandinavia': scandinavia, 'ukraine': ukraine, 'greatBritain': greatBritain, 'northEur': northEur,
-                   'westEur': westEur, 'southEur': southEur, 'ural': ural, 'siberia': siberia, 'yakutsk': yakutsk,
-                   'kamchatka': kamchatka, 'irkutsk': irkutsk, 'mongolia': mongolia, 'japan': japan,
-                   'afghanistan': afghanistan, 'china': china, 'middleEast': middleEast, 'india': india, 'siam': siam,
-                   'northAfr': northAfr, 'egypt': egypt, 'eastAfr': eastAfr, 'congo': congo, 'madagascar': madagascar,
-                   'southAfr': southAfr, 'indonesia': indonesia, 'newGuinea': newGuinea, 'westAustr': westAustr,
-                   'eastAustr': eastAustr},
-                  {'northAmerica': northAmerica, 'southAmerica': southAmerica, 'europe': europe, 'asia': asia,
+    board = Board(board_id, game_name, {'alaska': alaska, 'northwestTer': northwestTer, 'greenland': greenland,
+                    'alberta': alberta, 'ontario': ontario, 'quebec': quebec, 'westUS': westUS, 'eastUS': eastUS,
+                    'centralAmer': centralAmer, 'venezuela': venezuela, 'peru': peru, 'brazil': brazil,
+                    'argentina': argentina, 'iceland': iceland, 'scandinavia': scandinavia, 'ukraine': ukraine,
+                    'greatBritain': greatBritain, 'northEur': northEur, 'westEur': westEur, 'southEur': southEur,
+                    'ural': ural, 'siberia': siberia, 'yakutsk': yakutsk, 'kamchatka': kamchatka, 'irkutsk': irkutsk,
+                    'mongolia': mongolia, 'japan': japan, 'afghanistan': afghanistan, 'china': china,
+                    'middleEast': middleEast, 'india': india, 'siam': siam, 'northAfr': northAfr, 'egypt': egypt,
+                    'eastAfr': eastAfr, 'congo': congo, 'madagascar': madagascar, 'southAfr': southAfr,
+                    'indonesia': indonesia, 'newGuinea': newGuinea, 'westAustr': westAustr, 'eastAustr': eastAustr},
+                   {'northAmerica': northAmerica, 'southAmerica': southAmerica, 'europe': europe, 'asia': asia,
                    'africa': africa, 'australia': australia},
                   players, map_name, unitchart)
 

@@ -204,7 +204,7 @@ class Continent:
 
 class Board:
     """Class Board"""
-    def __init__(self, board_id, territorylist, continentlist, playerslist, map_name, unitchart):
+    def __init__(self, board_id, game_name, territorylist, continentlist, playerslist, map_name, unitchart):
         """
         Class constructor
         :param territorylist: dict
@@ -214,6 +214,7 @@ class Board:
         :param unitchart: dict
         """
         self.id = board_id
+        self.game_name = game_name
         self.map_name = map_name
         self.territories = territorylist
         self.continents = continentlist
@@ -222,8 +223,8 @@ class Board:
         self.phase = 1
         units = unitchart[len(playerslist)]
         for key, player in playerslist.items():
-            if player[0] == 'self-player':
-                self.players['player'+str(key)] = Human(key, player[1], units)
+            if player[0] in ['self-player', 'human-player']:
+                self.players['player'+str(key)] = Human(key, player[1], units, player_id=player[3])
             elif player[0] == 'ai-player':
                 if player[2] == 'random':
                     self.players['player'+str(key)] = RandomAI(key, player[1], units)
@@ -245,6 +246,13 @@ class Board:
         :return: string
         """
         return self.map_name
+
+    def get_game_name(self):
+        """
+        Map name getter
+        :return: string
+        """
+        return self.game_name
 
     def get_territories(self):
         """
