@@ -91,6 +91,8 @@ def render_board(board, chosen_territory=None, destination_territory=None, log=N
     if phase == 'deployment':
         if active_player.get_units() <= 0:
             return game(board)
+        if destination_territory:
+            question_box = [destination_territory.get_title(), '', active_player.get_units()]
         active_territories = [ter.get_name() for ter in board.player_territories(active_player)]
     if phase == 'attack':
         if destination_territory:

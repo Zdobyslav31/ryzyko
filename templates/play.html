@@ -40,13 +40,16 @@
             <a href="{{ url_for('play') }}"><button class="div cancel">&times;</button></a>
             {% if phase == 'attack' %}
                 Atakujesz {{ question_box[1] }} z {{ question_box[0] }}
-            {% else %}
+            {% elif phase == 'fortify' %}
                 Przenosisz wojska z {{ question_box[0] }} do {{ question_box[1] }}
+            {% else %}
+                Dodajesz wzmocnienia do {{ question_box[0] }}
             {% endif %}
             <br>
-            <form action="{{ url_for('play') }}/{{ phase }}/{{ chosen_territory }}/{{ destination_territory }}">
-                <label for="units">Ilu jednostek chcesz użyć do tego ruchu?</label>
-                <input type="number" name="units" min="1" max="{{ question_box[2] }}" value="{{ question_box[2] }}">
+            <form action="{{ url_for('play') }}/{{ phase }}{% if phase != 'deployment' %}/{{ chosen_territory }}{% endif %}/{{ destination_territory }}">
+                <label for="units">Ilu jednostek chcesz do tego użyć?</label>
+                <input type="number" name="units" min="1" max="{{ question_box[2] }}"
+                       value="{% if phase == 'deployment' %}1{% else %}{{ question_box[2] }}{% endif %}">
                 <input type="submit" value="Wykonaj!">
             </form>
         </div>

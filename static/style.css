@@ -34,23 +34,27 @@
 }
 
 .alert-danger {
-	background-color: rgb(210, 64, 50);
-	border: 2px solid rgb(119, 2, 0);
+	background-color: rgb(242, 222, 222);
+	border: 2px solid rgb(235, 204, 209);
+    color: rgb(169, 68, 66);
 }
 
 .alert-info {
-	background-color: rgb(69, 153, 210);
-	border: 2px solid rgb(21, 24, 105);
+	background-color: rgb(217, 237, 247);
+	border: 2px solid rgb(188, 232, 241);
+    color: rgb(49, 112, 143);
 }
 
 .alert-success {
-	background-color: rgb(143, 238, 149);
-	border: 2px solid rgb(0, 103, 11);
+	background-color: rgb(223, 240, 216);
+	border: 2px solid rgb(214, 233, 198);
+    color: rgb(60, 118, 61);
 }
 
 .alert-warning {
-	background-color: rgb(210, 206, 114);
-	border: 2px solid rgb(171, 145, 17);
+	background-color: rgb(252, 248, 227);
+	border: 2px solid rgb(250, 235, 204);
+    color: rgb(138, 109, 59);
 }
 
 .cancel{

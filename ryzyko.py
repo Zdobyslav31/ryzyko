@@ -35,6 +35,7 @@ def id_iterator():
 GAMES_PATH = os.path.dirname(os.path.abspath(__file__)) + '/static/games/'
 ID_GENERATOR = id_iterator()
 
+
 @app.route('/')
 def hello():
     """
@@ -89,7 +90,7 @@ def initial(territory=None):
         flash(MESSAGES['wrong-phase'], 'danger')
         return game.render_board(board)
     active_player = board.active_player()
-    if board.territories[territory].get_owner() is None:
+    if board.get_territory(territory).get_owner() is None:
         board.set_owner(territory, active_player, 1)
         active_player.decrease_units(1)
     else:
@@ -117,8 +118,8 @@ def initial_reinforce(territory=None):
         flash(MESSAGES['wrong-phase'], 'danger')
         return game.render_board(board)
     active_player = board.active_player()
-    if board.territories[territory].get_owner() == board.active_player():
-        board.territories[territory].reinforce(1)
+    if board.get_territory(territory).get_owner() == board.active_player():
+        board.get_territory(territory).reinforce(1)
         active_player.decrease_units(1)
     else:
         flash(MESSAGES['illegal-deployment'], 'danger')
@@ -148,12 +149,20 @@ def deploy(territory):
     if active_player.get_units() <= 0:
         flash(MESSAGES['not-enough-units'], 'danger')
         return game.render_board(board)
-    if board.territories[territory].get_owner() == board.active_player():
-        board.territories[territory].reinforce(1)
-        active_player.decrease_units(1)
-    else:
+    if board.get_territory(territory).get_owner() != board.active_player():
         flash(MESSAGES['illegal-deployment'], 'danger')
         return game.render_board(board)
+    else:
+        territory = board.get_territory(territory)
+        if request.args.get('units'):
+            units = int(request.args.get('units'))
+            territory.reinforce(units)
+            active_player.decrease_units(units)
+        elif active_player.get_units() == 1:
+            territory.reinforce(1)
+            active_player.decrease_units(1)
+        else:
+            return game.render_board(board, destination_territory=territory)
     if active_player.get_units() <= 0:
         board.new_phase()
     pickle.dump(board, open(GAMES_PATH + str(board_id) + '/board.pkl', 'wb'))
@@ -176,7 +185,7 @@ def attack_choose(territory):
     if board.get_phase() != 'attack':
         flash(MESSAGES['wrong-phase'], 'danger')
         return game.render_board(board)
-    territory = board.territories[territory]
+    territory = board.get_territory(territory)
     if territory.get_owner() != board.active_player():
         flash(MESSAGES['illegal-chose'], 'danger')
         return game.render_board(board)
@@ -203,8 +212,8 @@ def attack_commit(territory_from, territory_to):
     if board.get_phase() != 'attack':
         flash(MESSAGES['wrong-phase'], 'danger')
         return game.render_board(board)
-    territory_from = board.territories[territory_from]
-    territory_to = board.territories[territory_to]
+    territory_from = board.get_territory(territory_from)
+    territory_to = board.get_territory(territory_to)
     if territory_to == territory_from:
         flash(MESSAGES['chose-cancelled'], 'info')
         return game.render_board(board)
@@ -213,7 +222,7 @@ def attack_commit(territory_from, territory_to):
         units = int(request.args.get('units'))
         # do zrobienia: sprawdzenie poprawności
         if board.attack(territory_from, territory_to, units):
-            flash(MESSAGES['attack-success'], 'danger')
+            flash(MESSAGES['attack-success'], 'success')
         else:
             flash(MESSAGES['attack-fail'], 'danger')
         if board.check_elimination():
@@ -242,7 +251,7 @@ def fortify_choose(territory):
     if board.get_phase() != 'fortify':
         flash(MESSAGES['wrong-phase'], 'danger')
         return game.render_board(board)
-    territory = board.territories[territory]
+    territory = board.get_territory(territory)
     if territory.get_owner() != board.active_player():
         flash(MESSAGES['illegal-chose'], 'danger')
         return game.render_board(board)
@@ -270,8 +279,8 @@ def fortify_commit(territory_from, territory_to):
     if board.get_phase() != 'fortify':
         flash(MESSAGES['wrong-phase'], 'danger')
         return game.render_board(board)
-    territory_from = board.territories[territory_from]
-    territory_to = board.territories[territory_to]
+    territory_from = board.get_territory(territory_from)
+    territory_to = board.get_territory(territory_to)
     if territory_to == territory_from:
         flash(MESSAGES['chose-cancelled'], 'info')
         return game.render_board(board)
@@ -297,7 +306,8 @@ def newgame():
     players = {}
     for i in range(1, int(request.args.get('players_num')) + 1):
         players[str(i)] = [
-            request.args.get('player' + str(i)), request.args.get('player' + str(i) + 'name'),
+            request.args.get('player' + str(i)),
+            request.args.get('player' + str(i) + 'name'),
             request.args.get('player' + str(i) + 'algorithm')
         ]
     map_name = request.args.get('map_name')
@@ -405,23 +415,6 @@ def new(map_name, players):
     return board
 
 
-@app.route('/cookie')
-def set_cookie():
-    resp = make_response(render_template('test.html', test=os.path.dirname(os.path.abspath(__file__))))
-    resp.set_cookie('name', 'He is cookie')
-    return resp
-
-
-@app.route('/get-cookie')
-def get_cookie():
-    name = request.cookies.get('name')
-    if name:
-        return render_template('test.html', test=name)
-    else:
-        return 'No cookie'
-
-
 if __name__ == '__main__':
     app.secret_key = os.urandom(24)
-    app.run(host="0.0.0.0", port=5017)   # tu jako parametry host, port, debug - przykłady na wierzbie /home/zajecia/interfejs
-
+    app.run(host="0.0.0.0", port=5017)

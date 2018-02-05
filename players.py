@@ -2,19 +2,22 @@ import random
 
 class Player:
     """Abstract class Player"""
-    def __init__(self, id, name, units):
+    def __init__(self, id_on_board, name, units):
         """
         Class constructor
-        :param id: int
+        :param id_on_board: int
         :param name: string
         :param units: int
         """
-        self.id = id
+        self.id_on_board = id_on_board
         self.name = name
         self.units = units
         self.territory_list = []
         self.eliminated = False
-        self.log = {'player': (self.name, self.id), 'deploy': {}, 'attack': [], 'fortify': ()}
+        self.log = {'player': (self.name, self.id_on_board), 'deploy': {}, 'attack': [], 'fortify': ()}
+
+    def __repr__(self):
+        return 'Player %s, id: %s type: %s' % (self.name, self.id_on_board, type(self))
 
     def get_units(self):
         """
@@ -35,14 +38,14 @@ class Player:
         Id getter
         :return: int
         """
-        return self.id
+        return self.id_on_board
 
     def repr_id(self):
         """
-        Writes out full-id of the player
+        Writes out full-id_on_board of the player
         :return: string
         """
-        return 'player' + str(self.id)
+        return 'player' + str(self.id_on_board)
 
     def get_territories(self):
         """
@@ -101,7 +104,7 @@ class Player:
 
     def dump_log(self):
         log = self.log
-        self.log = {'player': (self.name, self.id), 'deploy': {}, 'attack': [], 'fortify': ()}
+        self.log = {'player': (self.name, self.id_on_board), 'deploy': {}, 'attack': [], 'fortify': ()}
         return log
 
     def get_log(self):
@@ -111,7 +114,12 @@ class Player:
 
 class Human(Player):
     """Class Human Player"""
-    pass
+    def __init__(self, id_on_board, name, units, player_id=None):
+        super().__init__(id_on_board, name, units)
+        self.player_id = player_id
+
+    def get_player_id(self):
+        return self.player_id
 
 
 class Computer(Player):
@@ -122,7 +130,7 @@ class Computer(Player):
         :param board: Board
         :return: void
         """
-        territory = self.territory_to_possess(board)
+        territory = self.territory_to_possess([ter for ter in board.get_territories() if ter.get_owner() is None])
         board.set_owner(territory.get_name(), self, 1)
 
     def deploy_once(self, board):
@@ -190,8 +198,7 @@ class Computer(Player):
 class RandomAI(Computer):
     """Class RandomAI - implementation of Computer Player
     Makes every move random"""
-    def territory_to_possess(self, board):
-        territories = [ter for ter in board.get_territories() if ter.get_owner() is None]
+    def territory_to_possess(self, territories):
         return self.random_territory(territories)
 
     def territory_to_reinforce(self, territories):
@@ -220,14 +227,14 @@ class RandomAI(Computer):
 class EasyAI(Computer):
     """Class EasyAI - implementation of Computer Player
     Implements easy algorithms for AI"""
-    def territory_to_possess(self, board):
+    def territory_to_possess(self, territories):
         """
         Wybiera terytorium o największej liczbie sojuszniczych sąsiadów
         :param board: Board
         :return: Territory
         """
         territories = sorted(
-            [ter for ter in board.get_territories() if ter.get_owner() is None],
+            territories,
             key=lambda territory: len([ter for ter in territory.get_neighbours()if ter.get_owner() == self]),
             reverse=True
         )

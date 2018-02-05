@@ -4,7 +4,7 @@ import random
 
 class Territory:
     """Class Territory"""
-    def __init__(self, name, title, player=None, armies=0):
+    def __init__(self, name, title, player=None, armies=0, continent=None):
         """
         Class constructor
         :param name: string
@@ -17,6 +17,10 @@ class Territory:
         self.armies = armies
         self.connections = []
         self.title = title
+        self.continent = continent
+
+    def __repr__(self):
+        return 'Territory %s, owner: %s, strength: %d' % (self.title, self.player.get_name(), self.get_strength())
 
     def make_connection(self, territory):
         """
@@ -25,6 +29,12 @@ class Territory:
         :return: void
         """
         self.connections.append(territory)
+
+    def set_continent(self, continent):
+        self.continent = continent
+
+    def get_continent(self, continent):
+        return self.continent
 
     def get_name(self):
         """
@@ -122,7 +132,7 @@ class Territory:
         :return connected: set
         """
         if connected is None:
-            connected=set()
+            connected = set()
         connected.add(self)
         for ter in self.connections:
             if ter.get_owner() == self.player and ter not in connected:
@@ -152,6 +162,8 @@ class Continent:
         self.name = name
         self.territories = territorylist
         self.units = units
+        for ter in territorylist:
+            ter.set_continent(self)
 
     def get_name(self):
         """
@@ -309,12 +321,12 @@ class Board:
         :return: Player
         """
         if self.turn == 0:
-            id = self.phase % len(self.players)
+            player_id = self.phase % len(self.players)
         else:
-            id = self.turn % len(self.players)
-        if id == 0:
-            id = len(self.players)
-        return self.players['player' + str(id)]
+            player_id = self.turn % len(self.players)
+        if player_id == 0:
+            player_id = len(self.players)
+        return self.players['player' + str(player_id)]
 
     def new_turn(self):
         """
@@ -411,18 +423,15 @@ class Board:
             for i in range(defending_units):
                 defender_dices.append(random.randrange(1, 7))
             defender_dices = sorted(defender_dices, reverse=True)
-            print('attacker: ', attacker_dices, '; defender: ', defender_dices)
             for i in range(min(len(attacker_dices), len(defender_dices))):
                 if attacker_dices[i] > defender_dices[i]:
                     defending_units -= 1
                 else:
                     attacking_units -= 1
         if attacking_units:
-            print('attacker wins')
             self.set_owner(ter_defence.get_name(), ter_attack.get_owner(), attacking_units)
             return True
         else:
-            print('defender wins')
             ter_defence.set_strength(defending_units)
             return False
 
@@ -446,7 +455,6 @@ class Board:
         """
         return [player for key, player in self.players.items() if player.is_eliminated() is False]
 
-
     def fortify(self, ter_from, ter_to, units):
         """
         Move units
@@ -468,5 +476,3 @@ def set_connections(*connections):
     for pair in connections:
         pair[0].make_connection(pair[1])
         pair[1].make_connection(pair[0])
-
-

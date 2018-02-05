@@ -6,21 +6,21 @@
     <form method="GET" action="{{ url_for('newgame')}}">
         <label for="player1">Gracz 1</label>
         <select name="player1">
-            <option value="self-player">Ja (ten komputer)</option>
+            <option value="self-player">Ja (z tego okna)</option>
         </select>
         <label for="player1name">Imię gracza:</label>
         <input type="text" name="player1name">
         <br>
         {% for i in range(2, players_num + 1) %}
             <label for="player{{ i }}">Gracz {{ i }}</label>
-            <select name="player{{ i }}" onchange="showDiv(this, 'player{{ i }}algorithm')">
-                <option value="self-player">Ten komputer</option>
+            <select name="player{{ i }}" onchange="toggleAlgorithmChoose(this, 'player{{ i }}algorithm')">
                 <option value="ai-player">Gracz komputerowy</option>
+                <option value="self-player">Gracz ludzki (z tego okna)</option>
                 <option value="human-player" disabled>Inny gracz online</option>
             </select>
         <label for="player{{ i }}name">Imię gracza:</label>
         <input type="text" name="player{{ i }}name">
-        <div  id="player{{ i }}algorithm" style="display: none">
+        <div  id="player{{ i }}algorithm" style="display: inline">
             <label for="player{{ i }}algorithm">Algorytm</label>
             <select name="player{{ i }}algorithm">
                 <option value="easy">EasyAI</option>
@@ -34,7 +34,7 @@
         <input type="submit" value="Graj!">
     </form>
     <script>
-        function showDiv(elem, id) {
+        function toggleAlgorithmChoose(elem, id) {
             if(elem.value === "ai-player")
                 document.getElementById(id).style.display = "inline";
             else
