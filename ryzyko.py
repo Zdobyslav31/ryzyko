@@ -79,8 +79,8 @@ def play(phase=None, territory=None, destination=None):
     Function play - front controller
     :param phase: str/None
     :param territory: str/None
-    :param territory_from: str/None
-    :param territory_to: str/None
+    :param territory: str/None
+    :param destination: str/None
     :return:
     """
     """Check player and load board"""
@@ -203,6 +203,7 @@ def new(map_name, game_name, players):
     """
     New game creator
     :param map_name: string
+    :param game_name: string
     :param players: dict
     :return: Board
     """
