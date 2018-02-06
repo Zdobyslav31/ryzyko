@@ -21,18 +21,21 @@
             <a href="{{ url_for('hello') }}"><button>Zagraj jeszcze raz</button></a>
         </div>
         <div class="options">
-            <h1>Ruchy w tej rundzie</h1>
+            <h1>Historia gry</h1>
             {% for turn, actions in log %}
                 {% if turn == 0 %}
                     <h2>Faza początkowa</h2>
+                    {% for phase, action in actions.items() %}
+                        {% if phase != 'deploy' %}
+                            <div class="player{{ action[1] }}">{{ action[2] }} zajmuje {{ action[0] }}</div>
+                        {% endif %}
+                    {% endfor %}
                     {% for phase, action in actions.items() %}
                         {% if phase == 'deploy' %}
                             <h2>Początkowe wzmocnienia</h2>
                             {% for territory, deployment in action.items() %}
                                 <div class="player{{ deployment['player_id'] }}">{{ deployment['player'] }} wzmacnia {{ territory }} {{ deployment['units'] }} jednostkami</div>
                             {% endfor %}
-                        {% else %}
-                            <div class="player{{ action[1] }}">{{ action[2] }} zajmuje {{ action[0] }}</div>
                         {% endif %}
                     {% endfor %}
                 {% else %}
