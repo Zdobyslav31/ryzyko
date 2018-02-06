@@ -2,10 +2,6 @@
 {% block title %}Wybór graczy{% endblock %}
 {% block head %}{% endblock %}
 {% block body %}
-    {% if overwrite %}
-        Uwaga! Masz niedokończoną grę. Stworzenie nowej spowoduje usunięcie starej. Może jednak chcesz dokończyć partię?
-        <a href="{{ url_for('play') }}"><button>Rzeczywiście, chcę</button></a><br>
-    {% endif %}
     <form method="GET" action="{{ url_for('choose_players')}}">
         <h1>Dostosuj grę</h1>
         <label for="game_name">Nazwa gry:</label>

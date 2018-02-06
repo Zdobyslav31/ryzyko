@@ -66,9 +66,10 @@
                 <br><a href="{{ url_for('play') + '/new_phase' }}"><button><strong>Zakończ rundę bez przenoszenia wojsk</strong></button></a>
             {% endif %}
             {% if log %}
-                <h1>Ruchy pozostałych graczy</h1>
-                {% for turn, actions in log.items() %}
-                    <h2 class="player{{ actions['player'][1] }}">Ruchy gracza {{ actions['player'][0] }}</h2>
+                <h1>Ruchy w tej rundzie</h1>
+                {% for turn, actions in log %}
+                    {% if actions['deploy'] %}
+                        <h2 class="player{{ actions['player'][1] }}">Ruchy gracza {{ actions['player'][0] }}</h2>
                         <h3>Wzmocnienia</h3>
                         {% for ter, dep in actions['deploy'].items() %}
                             {{ dep }} jednostek na terytorium {{ ter }}<br>
@@ -77,10 +78,14 @@
                         {% for attack in actions['attack'] %}
                             Atak {{ attack[2] }} jednostkami z {{ attack[0] }} na {{ attack[1] }} - {% if attack[3] %}sukces{% else %}porażka{% endif %}<br>
                         {% endfor %}
+                        {% for elimination in actions['elimination'] %}
+                            <div class="player{{ elimination[0] }}">W tej turze {{ elimination[1] }} został wyeliminowany</div>
+                        {% endfor %}
                         <h3>Przegrupowania</h3>
                         {% if actions['fortify'] %}
                             {{ actions['fortify'][2] }} jednostek z {{ actions['fortify'][0] }} do {{ actions['fortify'][1] }}
                         {% endif %}
+                    {% endif %}
                 {% endfor %}
             {% endif %}
         </div>

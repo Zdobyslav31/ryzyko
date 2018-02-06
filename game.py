@@ -31,11 +31,11 @@ def initial(board, territory):
     """
     Initial phase controller
     :param board: Board
-    :param territory: string
+    :param territory: Territory
     :return:
     """
     active_player = board.active_player()
-    if board.get_territory(territory).get_owner() is None:
+    if territory.get_owner() is None:
         board.set_owner(territory, active_player, 1)
         active_player.decrease_units(1)
     else:
@@ -50,13 +50,11 @@ def initial_reinforce(board, territory):
     """
     Initial reinforce phase controller
     :param board: Board
-    :param territory: string
+    :param territory: Territory
     :return:
     """
-    active_player = board.active_player()
-    if board.get_territory(territory).get_owner() == board.active_player():
-        board.get_territory(territory).reinforce(1)
-        active_player.decrease_units(1)
+    if territory.get_owner() == board.active_player():
+        board.reinforce(territory, 1)
     else:
         flash(MESSAGES['illegal-deployment'], 'danger')
         return render_board(board)
@@ -69,25 +67,22 @@ def deploy(board, territory):
     """
     Deployment phase controller
     :param board: Board
-    :param territory: string
+    :param territory: Territory
     :return:
     """
     active_player = board.active_player()
     if active_player.get_units() <= 0:
         flash(MESSAGES['not-enough-units'], 'danger')
         return render_board(board)
-    if board.get_territory(territory).get_owner() != board.active_player():
+    if territory.get_owner() != board.active_player():
         flash(MESSAGES['illegal-deployment'], 'danger')
         return render_board(board)
     else:
-        territory = board.get_territory(territory)
         if request.args.get('units'):
             units = int(request.args.get('units'))
-            territory.reinforce(units)
-            active_player.decrease_units(units)
+            board.reinforce(territory, units)
         elif active_player.get_units() == 1:
-            territory.reinforce(1)
-            active_player.decrease_units(1)
+            board.reinforce(territory, 1)
         else:
             return render_board(board, destination_territory=territory)
     if active_player.get_units() <= 0:
@@ -100,15 +95,14 @@ def attack(board, territory, destination):
     """
     Attack phase controller
     :param board: Board
-    :param territory: string
-    :param destination: string
+    :param territory: Territory
+    :param destination: Territory
     :return:
     """
     if not territory:
         return game(board)
     
     """Checking correction of territory"""
-    territory = board.get_territory(territory)
     if territory.get_owner() != board.active_player():
         flash(MESSAGES['illegal-chose'], 'danger')
         return render_board(board)
@@ -124,7 +118,6 @@ def attack(board, territory, destination):
         return render_board(board, chosen_territory=territory)
 
     """Chose canceled"""
-    destination = board.get_territory(destination)
     if territory is destination:
         flash(MESSAGES['chose-cancelled'], 'info')
         return render_board(board)
@@ -169,15 +162,14 @@ def fortify(board, territory, destination):
     """
     Fortification phase controller
     :param board: Board
-    :param territory: string
-    :param destination: string
+    :param territory: Territory
+    :param destination: Territory
     :return:
     """
     if not territory:
         return game(board)
 
     """Checking correction of territory"""
-    territory = board.get_territory(territory)
     if territory.get_owner() != board.active_player():
         flash(MESSAGES['illegal-chose'], 'danger')
         return render_board(board)
@@ -193,7 +185,6 @@ def fortify(board, territory, destination):
         return render_board(board, chosen_territory=territory)
 
     """Chose canceled"""
-    destination = board.get_territory(destination)
     if territory is destination:
         flash(MESSAGES['chose-cancelled'], 'info')
         return render_board(board)
@@ -235,7 +226,6 @@ def game(board):
     active_player = board.active_player()
     if len(board.alive_players()) <= 1:
         return end_game()
-    current_log = {}
 
     while issubclass(type(active_player), Computer) or active_player.is_eliminated():
         if active_player.is_eliminated():
@@ -267,7 +257,6 @@ def game(board):
             phase = board.get_phase()
         elif phase == 'fortify':
             active_player.fortify(board)
-            current_log[board.get_turn()] = active_player.get_log()
             board.new_phase()
             active_player = board.active_player()
             phase = board.get_phase()
@@ -275,19 +264,20 @@ def game(board):
             return 'Error!'
 
     if type(active_player) is Human:
-        log = collections.OrderedDict(sorted(current_log.items()))
-        return render_board(board, log=log)
+        # log = collections.OrderedDict(sorted(current_log.items()))
+        return render_board(board)
 
 
 def render_board(board, chosen_territory=None, destination_territory=None, log=None, abandon=False, watching=False):
     """
     Board renderer
     Renders board for player according to phase
-    :param board:
+    :param board: Board
     :param chosen_territory: Territory/None
     :param destination_territory: Territory/None
-    :param abandon: Bool
+    :param abandon: bool
     :param log: dict/none
+    :param watching: bool
     :return: render_template()
     """
     if len(board.alive_players()) <= 1:
@@ -303,57 +293,58 @@ def render_board(board, chosen_territory=None, destination_territory=None, log=N
     if board.active_player() not in current_player_instances:
         watching = True
 
-    if not watching:
-        if phase == 'initial':
-            if active_player.get_units() <= 0:
-                board.new_phase()
-                return game(board)
-            active_territories = [ter.get_name() for ter in board.get_territories() if ter.get_owner() is None]
-        if phase == 'initial-reinforce':
-            if active_player.get_units() <= 0:
-                board.new_phase()
-                return game(board)
-            active_territories = [ter.get_name() for ter in board.player_territories(active_player)]
-        if phase == 'deployment':
-            if active_player.get_units() <= 0:
-                return game(board)
-            if destination_territory:
-                question_box = [destination_territory.get_title(), '', active_player.get_units()]
-            active_territories = [ter.get_name() for ter in board.player_territories(active_player)]
-        if phase == 'attack':
-            if destination_territory:
-                question_box = [chosen_territory.get_title(), destination_territory.get_title(),
-                                chosen_territory.get_strength()-1]
-            elif chosen_territory:
-                active_territories = [ter.get_name() for ter in chosen_territory.get_neighbours()
-                                      if ter.get_owner() != board.active_player()] + [chosen_territory.get_name()]
-            else:
-                active_territories = [ter.get_name() for ter in board.player_territories(active_player)
-                                      if ter.get_strength() > 1 and ter.is_border()]
-                if len(active_territories) == 0:
-                    board.new_phase()
-                    return game(board)
-        if phase == 'fortify':
-            if destination_territory:
-                question_box = [
-                    chosen_territory.get_title(),
-                    destination_territory.get_title(),
-                    chosen_territory.get_strength()-1
-                ]
-            if chosen_territory:
-                active_territories = [ter.get_name() for ter in list(chosen_territory.get_connected())]
-            else:
-                active_territories = [ter.get_name() for ter in board.player_territories(active_player)
-                                      if ter.get_strength() > 1 and len(ter.get_connected()) > 1]
-                if len(active_territories) == 0:
-                    board.new_phase()
-                    return game(board)
-
-        pickle.dump(board, open(GAMES_PATH + str(board.get_id()) + '/board.pkl', 'wb'))
-        if chosen_territory:
-            chosen_territory = chosen_territory.get_name()
+    if phase == 'initial':
+        if active_player.get_units() <= 0:
+            board.new_phase()
+            return game(board)
+        active_territories = [ter.get_name() for ter in board.get_territories() if ter.get_owner() is None]
+    if phase == 'initial-reinforce':
+        if active_player.get_units() <= 0:
+            board.new_phase()
+            return game(board)
+        active_territories = [ter.get_name() for ter in board.player_territories(active_player)]
+    if phase == 'deployment':
+        if active_player.get_units() <= 0:
+            return game(board)
         if destination_territory:
-            destination_territory = destination_territory.get_name()
+            question_box = [destination_territory.get_title(), '', active_player.get_units()]
+        active_territories = [ter.get_name() for ter in board.player_territories(active_player)]
+    if phase == 'attack':
+        if destination_territory:
+            question_box = [chosen_territory.get_title(), destination_territory.get_title(),
+                            chosen_territory.get_strength()-1]
+        elif chosen_territory:
+            active_territories = [ter.get_name() for ter in chosen_territory.get_neighbours()
+                                  if ter.get_owner() != board.active_player()] + [chosen_territory.get_name()]
+        else:
+            active_territories = [ter.get_name() for ter in board.player_territories(active_player)
+                                  if ter.get_strength() > 1 and ter.is_border()]
+            if len(active_territories) == 0:
+                board.new_phase()
+                return game(board)
+    if phase == 'fortify':
+        if destination_territory:
+            question_box = [
+                chosen_territory.get_title(),
+                destination_territory.get_title(),
+                chosen_territory.get_strength()-1
+            ]
+        if chosen_territory:
+            active_territories = [ter.get_name() for ter in list(chosen_territory.get_connected())]
+        else:
+            active_territories = [ter.get_name() for ter in board.player_territories(active_player)
+                                  if ter.get_strength() > 1 and len(ter.get_connected()) > 1]
+            if len(active_territories) == 0:
+                board.new_phase()
+                return game(board)
+
+    pickle.dump(board, open(GAMES_PATH + str(board.get_id()) + '/board.pkl', 'wb'))
+    if chosen_territory:
+        chosen_territory = chosen_territory.get_name()
+    if destination_territory:
+        destination_territory = destination_territory.get_name()
+
+    log = board.get_current_log()
 
     return render_template('play.html', map=board.get_map_name(), territories=board.repr_territories(),
                            continents=board.repr_continents(), phase=board.get_phase(), round=board.get_round(),

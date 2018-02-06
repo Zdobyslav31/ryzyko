@@ -20,5 +20,42 @@
             Zwycięzca: {{ player[1] }}<br>
             <a href="{{ url_for('hello') }}"><button>Zagraj jeszcze raz</button></a>
         </div>
+        <div class="options">
+            <h1>Ruchy w tej rundzie</h1>
+            {% for turn, actions in log %}
+                {% if turn == 0 %}
+                    <h2>Faza początkowa</h2>
+                    {% for phase, action in actions.items() %}
+                        {% if phase == 'deploy' %}
+                            <h2>Początkowe wzmocnienia</h2>
+                            {% for territory, deployment in action.items() %}
+                                <div class="player{{ deployment['player_id'] }}">{{ deployment['player'] }} wzmacnia {{ territory }} {{ deployment['units'] }} jednostkami</div>
+                            {% endfor %}
+                        {% else %}
+                            <div class="player{{ action[1] }}">{{ action[2] }} zajmuje {{ action[0] }}</div>
+                        {% endif %}
+                    {% endfor %}
+                {% else %}
+                    {% if actions['deploy'] %}
+                        <h2 class="player{{ actions['player'][1] }}">Ruchy gracza {{ actions['player'][0] }}</h2>
+                        <h3>Wzmocnienia</h3>
+                        {% for ter, dep in actions['deploy'].items() %}
+                            {{ dep }} jednostek na terytorium {{ ter }}<br>
+                        {% endfor %}
+                        <h3>Ataki</h3>
+                        {% for attack in actions['attack'] %}
+                            Atak {{ attack[2] }} jednostkami z {{ attack[0] }} na {{ attack[1] }} - {% if attack[3] %}sukces{% else %}porażka{% endif %}<br>
+                        {% endfor %}
+                        {% for elimination in actions['elimination'] %}
+                            <div class="player{{ elimination[0] }}">W tej turze {{ elimination[1] }} został wyeliminowany</div>
+                        {% endfor %}
+                        <h3>Przegrupowania</h3>
+                        {% if actions['fortify'] %}
+                            {{ actions['fortify'][2] }} jednostek z {{ actions['fortify'][0] }} do {{ actions['fortify'][1] }}
+                        {% endif %}
+                    {% endif %}
+                {% endif %}
+            {% endfor %}
+        </div>
     </div>
 {% endblock %}

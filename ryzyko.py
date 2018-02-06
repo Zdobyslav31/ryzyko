@@ -30,9 +30,6 @@ def hello():
     :return: render_template
     """
     player_id = request.cookies.get('player_id')
-    print('request - player ', request.cookies.get('player_id'))
-    # if player_id -> write out player's games
-    # player can choose: to continue started game, to create new or to join open one
     response = make_response(render_template('hello.html'))
     if not player_id:
         response.set_cookie('player_id', str(id_generator()))
@@ -49,7 +46,7 @@ def join_game():
     if not player_id:
         flash(game.MESSAGES['session-expired'], 'error')
         return redirect(url_for('hello'))
-    games = pickle.load(open(GAMES_PATH + '/games.pkl', 'rb'))
+    games = pickle.load(open(GAMES_PATH + 'games.pkl', 'rb'))
     open_games = [(game_id, game_properties) for game_id, game_properties in games.items() if game_properties['open']]
     return render_template('join_game.html', games=open_games, player_id=player_id)
 
@@ -64,7 +61,7 @@ def select_game():
     if not player_id:
         flash(game.MESSAGES['session-expired'], 'error')
         return redirect(url_for('hello'))
-    games = pickle.load(open(GAMES_PATH + '/games.pkl', 'rb'))
+    games = pickle.load(open(GAMES_PATH + 'games.pkl', 'rb'))
     player_games = []
     for game_id, game_properties in games.items():
         my_game = False
@@ -88,7 +85,7 @@ def join():
     name = request.args.get('name')
     board_id, seat_id = request.args.get('player_id').split(',')
     board_id, seat_id = board_id, int(seat_id)
-    games = pickle.load(open(GAMES_PATH + '/games.pkl', 'rb'))
+    games = pickle.load(open(GAMES_PATH + 'games.pkl', 'rb'))
     games[board_id]['players'][seat_id - 1][1] = player_id
     games[board_id]['players'][seat_id - 1][2] = name
     open_game = False
@@ -96,7 +93,7 @@ def join():
         if not player[2]:
             open_game = True
     games[board_id]['open'] = open_game
-    pickle.dump(games, open(GAMES_PATH + '/games.pkl', 'wb'))
+    pickle.dump(games, open(GAMES_PATH + 'games.pkl', 'wb'))
     response = make_response(play(board_id=board_id))
     response.set_cookie('board_id', board_id)
     if os.path.exists(GAMES_PATH + board_id + '/board.pkl'):
@@ -138,11 +135,7 @@ def customize():
     player_id = request.cookies.get('player_id')
     if not player_id:
         return redirect(url_for('hello'))
-    board_id = request.cookies.get('board_id')
-    overwrite = False
-    if board_id and os.path.exists(GAMES_PATH + str(board_id) + '/board.pkl'):
-        overwrite = True
-    return render_template('customize.html', overwrite=overwrite)
+    return render_template('customize.html')
 
 
 @app.route('/choose_players')
@@ -191,7 +184,7 @@ def play(phase=None, territory=None, destination=None, board_id=None):
         return redirect(url_for('hello'))
 
     """Check if game is open"""
-    games = pickle.load(open(GAMES_PATH + '/games.pkl', 'rb'))
+    games = pickle.load(open(GAMES_PATH + 'games.pkl', 'rb'))
     if games[board.get_id()]['open']:
         return game.waiting_room(board, games)
 
@@ -208,6 +201,12 @@ def play(phase=None, territory=None, destination=None, board_id=None):
     if board.get_phase() != phase:
         flash(game.MESSAGES['wrong-phase'], 'danger')
         return game.render_board(board)
+
+    """Parse arguments"""
+    if territory:
+        territory = board.get_territory(territory)
+    if destination:
+        destination = board.get_territory(destination)
 
     if phase == 'initial':
         return game.initial(board, territory)
@@ -245,13 +244,13 @@ def newgame():
     game_name = request.args.get('game_name')
     board = new(map_name, game_name, players)
 
-    games = pickle.load(open(GAMES_PATH + '/games.pkl', 'rb'))
+    games = pickle.load(open(GAMES_PATH + 'games.pkl', 'rb'))
     games[board.get_id()] = {'game_name': board.get_game_name(),
                              'open': online,
                              'players': sorted([[pl.get_id(), pl.get_player_id(), pl.get_name()]
                                                 for pl in board.get_players()])
                              }
-    pickle.dump(games, open(GAMES_PATH + '/games.pkl', 'wb'))
+    pickle.dump(games, open(GAMES_PATH + 'games.pkl', 'wb'))
 
     if online:
         response = make_response(game.waiting_room(board, games))
@@ -274,13 +273,14 @@ def end_game():
         flash(game.MESSAGES['session-expired'], 'danger')
         return render_template('error.html')
     winner = board.alive_players()[0]
-    games = pickle.load(open(GAMES_PATH + '/games.pkl', 'rb'))
+    log = board.get_full_log()
+    games = pickle.load(open(GAMES_PATH + 'games.pkl', 'rb'))
     shutil.rmtree(GAMES_PATH + str(board_id))
     del games[board_id]
-    pickle.dump(games, open(GAMES_PATH + '/games.pkl', 'wb'))
+    pickle.dump(games, open(GAMES_PATH + 'games.pkl', 'wb'))
     flash(game.MESSAGES['game-deleted'], 'success')
     return render_template('end_game.html', map=board.get_map_name(), territories=board.repr_territories(),
-                           continents=board.repr_continents(),
+                           continents=board.repr_continents(), log=log,
                            round=board.get_round(), player=[winner.repr_id(), winner.get_name()])
 
 
@@ -298,10 +298,10 @@ def abandon_game():
         flash(game.MESSAGES['session-expired'], 'danger')
         return redirect(url_for('hello'))
     if request.args.get('confirm'):
-        games = pickle.load(open(GAMES_PATH + '/games.pkl', 'rb'))
+        games = pickle.load(open(GAMES_PATH + 'games.pkl', 'rb'))
         shutil.rmtree(GAMES_PATH + str(board_id))
         del games[board.get_id()]
-        pickle.dump(games, open(GAMES_PATH + '/games.pkl', 'wb'))
+        pickle.dump(games, open(GAMES_PATH + 'games.pkl', 'wb'))
         flash(game.MESSAGES['game-deleted'], 'success')
         return redirect(url_for('hello'))
     else:

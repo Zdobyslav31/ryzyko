@@ -231,7 +231,7 @@ class Board:
                 elif player[2] == 'easy':
                     self.players['player'+str(key)] = EasyAI(key, player[1], units)
         self.starting_units = len(playerslist) * units
-        self.log = {}
+        self.log = {0: {'deploy': {}}}
 
     def get_id(self):
         """
@@ -350,6 +350,21 @@ class Board:
         """
         return self.turn
 
+    def get_current_log(self):
+        """
+        Returns log for last round
+        :return:
+        """
+        return sorted([(turn, log) for turn, log in self.log.items()
+                       if turn >= self.turn - len(self.players) and 0 < turn < self.turn])
+
+    def get_full_log(self):
+        """
+        Returns log the whole game
+        :return:
+        """
+        return sorted([(turn, log) for turn, log in self.log.items()])
+
     def active_player(self):
         """
         Returns active player
@@ -370,9 +385,15 @@ class Board:
         Reinforces active player
         :return: void
         """
-        self.log[self.turn] = self.active_player().dump_log()
         self.phase = 0
         self.turn += 1
+        self.log[self.turn] = {
+            'player': (self.active_player().get_name(), self.active_player().get_id()),
+            'deploy': {},
+            'attack': [],
+            'fortify': (),
+            'elimination': []
+        }
         self.active_player().increase_units(self.count_reinforcements())
 
     def new_phase(self):
@@ -398,20 +419,21 @@ class Board:
         terlist = [ter for key, ter in self.territories.items() if ter.get_owner() == player]
         return terlist
 
-    def set_owner(self, territory_name, new_owner, armies):
+    def set_owner(self, territory, new_owner, armies):
         """
         Sets new owner of a territory
-        :param territory_name: string
+        :param territory: Territory
         :param new_owner: Player
         :param armies: int
         :return: void
         """
-        territory = self.territories[territory_name]
         old_owner = territory.get_owner()
         if old_owner:
             old_owner.abandon_territory(territory)
         new_owner.possess_territory(territory)
         territory.set_owner(new_owner, armies)
+        if self.turn == 0:
+            self.log[0][self.phase] = (territory.get_title(), new_owner.get_id(), new_owner.get_name())
 
     def units_left(self):
         """
@@ -436,6 +458,24 @@ class Board:
             if con.get_owner() == player:
                 reinforcements += con.get_units()
         return reinforcements
+    
+    def reinforce(self, territory, units):
+        territory.reinforce(units)
+        self.active_player().decrease_units(units)
+        if self.turn == 0:
+            if territory.get_title() in self.log[self.turn]['deploy']:
+                self.log[self.turn]['deploy'][territory.get_title()]['units'] += units
+            else:
+                self.log[self.turn]['deploy'][territory.get_title()] = {
+                    'player_id': self.active_player().get_id(),
+                    'units': units,
+                    'player':  self.active_player().get_name()
+                }
+        else:
+            if territory.get_title() in self.log[self.turn]['deploy']:
+                self.log[self.turn]['deploy'][territory.get_title()] += units
+            else:
+                self.log[self.turn]['deploy'][territory.get_title()] = units
 
     def attack(self, ter_attack, ter_defence, units):
         """
@@ -464,10 +504,12 @@ class Board:
                 else:
                     attacking_units -= 1
         if attacking_units:
-            self.set_owner(ter_defence.get_name(), ter_attack.get_owner(), attacking_units)
+            self.set_owner(ter_defence, ter_attack.get_owner(), attacking_units)
+            self.log[self.turn]['attack'].append((ter_attack.get_title(), ter_defence.get_title(), units, True))
             return True
         else:
             ter_defence.set_strength(defending_units)
+            self.log[self.turn]['attack'].append((ter_attack.get_title(), ter_defence.get_title(), units, False))
             return False
 
     def check_elimination(self):
@@ -477,8 +519,11 @@ class Board:
         """
         players_alive = len(self.players)
         for key, player in self.players.items():
+            yet = player.is_eliminated()
             if player.check_for_elimination():
                 players_alive -= 1
+                if not yet:
+                    self.log[self.turn]['elimination'].append([player.get_id(), player.get_name()])
         if players_alive == 1:
             return True
         return False
@@ -500,6 +545,7 @@ class Board:
         """
         ter_from.weaken(units)
         ter_to.reinforce(units)
+        self.log[self.turn]['fortify'] = (ter_from.get_title(), ter_to.get_title(), units)
 
 
 def set_connections(*connections):

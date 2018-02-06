@@ -52,8 +52,9 @@ body {
     display: block;
     padding: 5px 15px;
     text-decoration: none;
-    color: darkred;
-    background-color: #ee825d;
+    color: red;
+	font-family: Georgia, serif;
+    background-color: navy;
 	-webkit-box-shadow: inset 0px 0px 15px 1px rgba(0,0,0,0.41);
 	-moz-box-shadow: inset 0px 0px 15px 1px rgba(0,0,0,0.41);
 	box-shadow: inset 0px 0px 15px 1px rgba(0,0,0,0.41);

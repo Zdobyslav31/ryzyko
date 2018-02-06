@@ -14,7 +14,6 @@ class Player:
         self.units = units
         self.territory_list = []
         self.eliminated = False
-        self.log = {'player': (self.name, self.id_on_board), 'deploy': {}, 'attack': [], 'fortify': ()}
 
     def __repr__(self):
         return 'Player %s, id: %s type: %s' % (self.name, self.id_on_board, type(self))
@@ -105,15 +104,6 @@ class Player:
         """
         return self.eliminated
 
-    def dump_log(self):
-        log = self.log
-        self.log = {'player': (self.name, self.id_on_board), 'deploy': {}, 'attack': [], 'fortify': ()}
-        return log
-
-    def get_log(self):
-        return self.log
-
-
 
 class Human(Player):
     """Class Human Player"""
@@ -140,20 +130,14 @@ class Computer(Player):
         :return: void
         """
         territory = self.territory_to_possess([ter for ter in board.get_territories() if ter.get_owner() is None])
-        board.set_owner(territory.get_name(), self, 1)
+        board.set_owner(territory, self, 1)
 
     def get_player_id(self):
         return 'ai'
 
     def deploy_once(self, board):
         territory = self.territory_to_reinforce(self.get_territories())
-        territory.reinforce(1)
-        self.decrease_units(1)
-        if board.get_round() != 0:
-            if territory.get_title() in self.log['deploy']:
-                self.log['deploy'][territory.get_title()] += 1
-            else:
-                self.log['deploy'][territory.get_title()] = 1
+        board.reinforce(territory, 1)
 
     def deploy(self, board):
         while self.units:
@@ -170,7 +154,6 @@ class Computer(Player):
                     success = board.attack(ter, target, units)
                     if success and target.get_strength() > 1:
                         territories.append(target)
-                    self.log['attack'].append((ter.get_title(), target.get_title(), units, success))
 
     def fortify(self, board):
         possible_territories_from = [ter for ter in self.get_territories()
@@ -184,7 +167,6 @@ class Computer(Player):
                     units = self.fortify_units(territory_from, territory_to)
                     if units > 0:
                         board.fortify(territory_from, territory_to, units)
-                        self.log['fortify'] = (territory_from.get_title(), territory_to.get_title(), units)
                 except IndexError:
                     print('error while trying to fortify from %s in group consisted of %s' % (territory_from, [ter for ter in territory_from.get_connected() if ter is not territory_from]))
 
