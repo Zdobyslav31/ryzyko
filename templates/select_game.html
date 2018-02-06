@@ -1,24 +1,29 @@
 {% extends 'layout.html' %}
-{% block title %}Otwarte gry online{% endblock %}
+{% block title %}Wybór gry{% endblock %}
 {% block head %}{% endblock %}
 {% block body %}
-    <h1>Dołącz do gry online</h1>
-    <form action="{{ url_for('select') }}">
-    Wybierz jedną z gier:<br>
-    {%  for game_id, game in games %}
-            <input type="radio" name="game_id" value="{{ game_id }}" required><strong>Gra: {{ game['game_name'] }}</strong>
-            {% for player in game['players'] %}
-                <div class="player{{ player[0] }} player">
-                    {% if player[1] == 'ai' %}
-                        {{ player[2] }} - gracz komputerowy
-                    {% elif player[1] == player_id %}
-                        <span style="color: white">{{ player[2] }} - ja</span>
-                    {% else %}
-                        {{ player[2] }} - gracz ludzki
-                    {% endif %}
-                </div>
+    <h1>Wybierz grę spośród rozpoczętych</h1>
+    {% if games %}
+        <form action="{{ url_for('select') }}">
+        Masz następujące otwarte gry:<br>
+            {%  for game_id, game in games %}
+                    <input type="radio" name="game_id" value="{{ game_id }}" required><strong>Gra: {{ game['game_name'] }}</strong>
+                    {% for player in game['players'] %}
+                        <div class="player{{ player[0] }} player">
+                            {% if player[1] == 'ai' %}
+                                {{ player[2] }} - gracz komputerowy
+                            {% elif player[1] == player_id %}
+                                <span style="color: white">{{ player[2] }} - ja</span>
+                            {% else %}
+                                {{ player[2] }} - gracz ludzki
+                            {% endif %}
+                        </div>
+                    {% endfor %}
             {% endfor %}
-    {% endfor %}
-    <input type="submit" value="Wybierz">
-    </form>
+            <input type="submit" value="Wybierz">
+        </form>
+    {% else %}
+        Nie masz żadnych rozpoczętych gier
+    {% endif %}
+    <a href="{{ url_for('hello') }}"><button>Powrót</button></a>
 {% endblock %}

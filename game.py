@@ -26,6 +26,14 @@ MESSAGES = {
     'game-not-found': 'Niestety, nie znalazłem żądanej gry!'
 }
 
+HELPER = {
+    'initial': 'Trwa faza początkowa. Możesz teraz zajmować terytoria, których jeszcze nikt nie zajął. Pozostałe oddziały będziesz mógł użyć do wzmocnienia swoich terytoriów, gdy już cała plansza zostanie zajęta.',
+    'initial-reinforce': 'Trwa faza początkowych wzmocnień. Użyj pozostałych oddziałów, by wzmocnić swoje terytoria.',
+    'deployment': 'Trwa faza wzmocnień. Otrzymałaś/eś wzmocnienia za posiadane terytoria i kontynenty. Możesz ich teraz użyć do wzmocnienia swoich terytoriów.',
+    'attack': 'Trwa faza ataku. Możesz atakować graniczące terytoria wroga. Gaza zakończy się na twoje życzenie lub gdy nie będzie już możliwości ataku.',
+    'fortify': 'Trwa faza przegrupowań. Masz prawo do jednego przeniesienia wojsk pomiędzy terytoriami, które są ze sobą połączone.'
+}
+
 
 def initial(board, territory):
     """
@@ -345,6 +353,9 @@ def render_board(board, chosen_territory=None, destination_territory=None, log=N
         destination_territory = destination_territory.get_name()
 
     log = board.get_current_log()
+    if watching:
+        active_territories = []
+        question_box = []
 
     return render_template('play.html', map=board.get_map_name(), territories=board.repr_territories(),
                            continents=board.repr_continents(), phase=board.get_phase(), round=board.get_round(),
@@ -352,4 +363,4 @@ def render_board(board, chosen_territory=None, destination_territory=None, log=N
                            active_territories=active_territories, units_left=board.active_player().get_units(),
                            question_box=question_box, log=log, abandon=abandon, game_name=board.get_game_name(),
                            chosen_territory=chosen_territory, destination_territory=destination_territory,
-                           watching=watching)
+                           watching=watching, helper=HELPER[board.get_phase()])
