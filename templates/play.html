@@ -4,10 +4,10 @@
     <link rel=stylesheet type=text/css href="{{ url_for('static', filename='maps/' + map + '/style.css') }}">
 {% endblock %}
 {% block body %}
-    <div class="{{ player[0] }}">
-        Faza: {{ phase }}, Gracz aktywny: {{ player[1] }}, Runda: {{ round }}<br>
+    <div class="turn {{ player[0] }}">
+        Faza: <strong>{{ phase }}</strong>, Gracz aktywny: <strong>{{ player[1] }}</strong>, Runda: <strong>{{ round }}</strong><br>
         {% if phase == 'initial' or phase == 'initial-reinforce' or phase == 'deployment' %}
-            Units left: {{ units_left }}
+            Pozostało jednostek: <strong>{{ units_left }}</strong>
         {% endif %}
     </div>
     {% if watching %}
