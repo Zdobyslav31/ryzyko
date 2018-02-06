@@ -2,7 +2,25 @@
 {% block title %}Witaj w grze!{% endblock %}
 {% block head %}{% endblock %}
 {% block body %}
-<a href="{{ url_for('customize') }}" ><button>Stwórz nową grę!</button></a>
-<a href="{{ url_for('select_game') }}" ><button>Wybierz spośród rozpoczętych gier</button></a>
-<a href="{{ url_for('join_game') }}" ><button>Dołącz do gry online</button></a>
+    <h1>Witaj w grze</h1>
+    <a href="{{ url_for('customize') }}" ><button>Stwórz nową grę!</button></a>
+    <a href="{{ url_for('select_game') }}" ><button>Wybierz spośród rozpoczętych gier</button></a>
+    <a href="{{ url_for('join_game') }}" ><button>Dołącz do gry online</button></a>
+    <h2>Zasady</h2>
+    <h3>Cel gry</h3>
+    Celem gry jest wyeliminowanie pozostałych graczy i zdobycie świata.
+    <h3>Plansza</h3>
+    Plansza składa się z terytoriów, które są połączone w kontynenty. Na początku gry gracze na przemian zajmują
+    terytoria ustawiając tam po jednym swoim oddziale. Później mogą dodawać więcej oddziałów.
+    <h3>Wzmocnienia</h3>
+    Na początku każdej tury gracz otrzymuje wzmocnienia za posiadane terytoria i całe posiadane kontynenty.
+    Liczba wzmocnień za kontynenty znajduje się w kwadratowym polu przy kontynencie.
+    <h3>Ataki</h3>
+    Gracze mogą atakować terytoria wroga, które  graniczą z ich terytoriami (uwaga: istnieją terytoria graniczące
+    ze sobą przez morze, oznaczone przerywaną linią), ale zawsze na każdy terytorium musi zostać
+    min. 1 oddział. W bitwie występuje element losowy (ale przewaga liczebna wciąż jest ważna).
+    Na zdobyte terytorium przechodzi cała zwycięska armia.
+    <h3>Przegrupowania</h3>
+    Na końcu swojej tury gracz ma prawo do jednorazowego przeniesienia dowolnej ilości oddziałów pomiędzy dwoma
+    terytoriami, między którymi istnieje połączenie przez jego terytoria.
 {% endblock %}
