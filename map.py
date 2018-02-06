@@ -491,11 +491,11 @@ class Board:
 
         while attacking_units and defending_units:
             attacker_dices = []
-            for i in range(attacking_units):
+            for i in range(min(3, attacking_units)):
                 attacker_dices.append(random.randrange(1, 7))
             attacker_dices = sorted(attacker_dices, reverse=True)
             defender_dices = []
-            for i in range(defending_units):
+            for i in range(min(2, defending_units)):
                 defender_dices.append(random.randrange(1, 7))
             defender_dices = sorted(defender_dices, reverse=True)
             for i in range(min(len(attacker_dices), len(defender_dices))):
