@@ -247,7 +247,7 @@ def newgame():
     try:
         games = pickle.load(open(GAMES_PATH + 'games.pkl', 'rb'))
     except EOFError:
-        games = []
+        games = dict()
     games[board.get_id()] = {'game_name': board.get_game_name(),
                              'open': online,
                              'players': sorted([[pl.get_id(), pl.get_player_id(), pl.get_name()]
