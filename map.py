@@ -33,7 +33,7 @@ class Territory:
     def set_continent(self, continent):
         self.continent = continent
 
-    def get_continent(self, continent):
+    def get_continent(self):
         return self.continent
 
     def get_name(self):
@@ -200,6 +200,22 @@ class Continent:
         :return: int
         """
         return self.units
+
+    def get_territories(self):
+        """
+        Territories getter
+        :return: list
+        """
+        return self.territories
+
+    def player_territories(self, player):
+        """
+        Returns territories of a given player
+        :param player: Player
+        :return: list
+        """
+        terlist = [ter for ter in self.territories if ter.get_owner() == player]
+        return terlist
 
 
 class Board:

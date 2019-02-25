@@ -286,3 +286,76 @@ class EasyAI(Computer):
                                                              for enemy in territory_from.get_enemies()])
             diff_to = territory_to.get_strength() - max([enemy.get_strength() for enemy in territory_to.get_enemies()])
             return (diff_from - diff_to) // 2
+
+
+class ContinentalAI(Computer):
+    """Class ContinentAI - implementation of Computer Player
+    Implements continent-oriented algorithms for AI"""
+    def territory_to_possess(self, territories):
+        """
+        Wybiera terytorium o największej liczbie sojuszniczych sąsiadów
+        :param board: Board
+        :return: Territory
+        """
+        territories = sorted(
+            territories,
+            key=lambda territory: (
+                len([ter for ter in territory.get_neighbours()if ter.get_owner() == self]),
+                len(territory.get_continent().player_territories(self))
+                / len(territory.get_continent().get_territories())
+                * territory.get_continent().get_units()
+            ),
+            reverse=True
+        )
+        return territories[0]
+
+    def territory_to_reinforce(self, territories, reverse=False):
+        """
+        Wybiera  terytorium o największej dysproporcji sił na niekorzyść w stosunku do najsilniejszego wrogiego sąsiada
+        :return: Territory
+        """
+        territories = sorted(
+            [ter for ter in territories if ter.is_border()],
+            key=lambda territory: (
+                territory.get_strength() - max([ter.get_strength() for ter in territory.get_enemies()]),
+                sum([ter.get_strength() for ter in territory.get_enemies()])
+            ),
+            reverse=reverse
+        )
+        return territories[0]
+
+    def attack_condition(self, territory):
+        return bool(territory.get_strength() > max([enemy.get_strength() for enemy in territory.get_enemies()]))
+
+    def select_target(self, enemies):
+        enemies = sorted(enemies, key=lambda enemy: enemy.get_strength())
+        return enemies[0]
+
+    def attack_units(self, attacker, target):
+        if len(attacker.get_enemies()) == 1:
+            return attacker.get_strength() - 1
+        elif attacker.get_strength() - target.get_strength() > 2:
+            return max(target.get_strength() + 2, (attacker.get_strength() - target.get_strength()) // 2)
+        else:
+            return attacker.get_strength() - 1
+
+    def territory_from_fortify(self, territories):
+        territories_from = sorted(
+            [ter for ter in self.get_territories() if ter.is_border() is False and ter.get_strength() > 1],
+            key=lambda ter: ter.get_strength(),
+            reverse=True
+        )
+        if len(territories_from) > 0:
+            return territories_from[0]
+        else:
+            return self.territory_to_reinforce(territories, reverse=True)
+
+    def fortify_units(self, territory_from, territory_to):
+        if len(territory_from.get_enemies()) == 0:
+            return territory_from.get_strength() - 1
+        else:
+            diff_from = territory_from.get_strength() - max([enemy.get_strength()
+                                                             for enemy in territory_from.get_enemies()])
+            diff_to = territory_to.get_strength() - max([enemy.get_strength() for enemy in territory_to.get_enemies()])
+            return (diff_from - diff_to) // 2
+
